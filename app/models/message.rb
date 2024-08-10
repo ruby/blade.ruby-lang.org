@@ -9,7 +9,7 @@ class Message < ApplicationRecord
     end
 
     def self.from_string(str)
-        hs, body = str.split(/\n\n/, 2)
+        hs, body = str.encode('utf-8', invalid: :replace).split(/\n\n/, 2)
         headers = hs.split(/\n/).map { |line|
           line.split(/:\s+/, 2)
         }.to_h
