@@ -9,12 +9,20 @@ class Message < ApplicationRecord
         headers = hs.split(/\n/).map { |line|
           line.split(/:\s+/, 2)
         }.to_h
-        
+
         self.new(
           body: body,
           subject: headers['Subject'],
           from: headers['From'],
-          id:1
         )
+    end
+
+    def self.from_string(list_name, list_seq, s)
+        hs, body = s.split(/\n\n/, 2)
+        headers = hs.split(/\n/).map { |line|
+          line.split(/:\s+/, 2)
+        }.to_h
+
+        self.new(body: body, subject: headers['Subject'], from: headers['From'])
     end
 end
