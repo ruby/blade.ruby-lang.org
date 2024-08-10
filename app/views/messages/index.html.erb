@@ -2,13 +2,10 @@
 
 <h1>Messages</h1>
 
-<div id="messages">
+<ul>
   <% @messages.each do |message| %>
-    <%= render message %>
-    <p>
-      <%= link_to "Show this message", message %>
-    </p>
+    <li><%= link_to message.subject, message %></li>
   <% end %>
-</div>
+</ul>
 
 <%= link_to "New message", new_message_path %>

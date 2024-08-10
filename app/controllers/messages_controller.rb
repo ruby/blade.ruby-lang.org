@@ -3,12 +3,21 @@ class MessagesController < ApplicationController
 
   # GET /messages or /messages.json
   def index
-    @messages = Message.all
+    query = params[:q]
+    if query
+      @messages = Message.where('body like ?', "%#{query}%")
+    else
+      @messages = Message.all
+    end
   end
 
   # GET /messages/1 or /messages/1.json
   def show
-    @message = Message.from_s3(params[:list_name], params[:list_seq])
+    if params[:id]
+      @message = Message.find(params[:id])
+    else
+      @message = Message.from_s3(params[:list_name], params[:list_seq])
+    end
   end
 
   # GET /messages/new
