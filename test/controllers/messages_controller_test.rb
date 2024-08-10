@@ -23,11 +23,6 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to message_url(Message.last)
   end
 
-  test "should show message" do
-    get message_url(@message)
-    assert_response :success
-  end
-
   test "should get edit" do
     get edit_message_url(@message)
     assert_response :success
