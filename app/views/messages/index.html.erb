@@ -4,7 +4,10 @@
 
 <ul>
   <% @messages.each do |message| %>
-    <li><%= link_to message.subject, message %></li>
+    <li>
+      <%= link_to message.subject, message %>
+      <small><%= message.body %></small>
+    </li>
   <% end %>
 </ul>
 

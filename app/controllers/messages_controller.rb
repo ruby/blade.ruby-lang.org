@@ -5,7 +5,12 @@ class MessagesController < ApplicationController
   def index
     query = params[:q]
     if query
-      @messages = Message.where('body like ?', "%#{query}%")
+      # %> and <-> are defined by pg_trgm.
+      # https://www.postgresql.org/docs/17/pgtrgm.html
+      @messages = Message.find_by_sql([
+        'SELECT * FROM messages WHERE body %> ? ORDER BY body <-> ? LIMIT 20',
+        query, query,
+      ])
     else
       @messages = Message.all
     end
