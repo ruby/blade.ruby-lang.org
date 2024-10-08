@@ -5,7 +5,9 @@
 <ul>
   <% @messages.each do |message| %>
     <li>
-      <%= link_to message.subject, message %>
+      <% list_name = List.find_by_id(message.list_id).name %>
+      <%= list_name %>:<%= message.list_seq %>
+      <%= link_to message.subject, "/#{list_name}/#{message.list_seq}" %>
       <small><%= message.body %></small>
     </li>
   <% end %>
