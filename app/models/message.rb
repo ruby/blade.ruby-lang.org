@@ -5,7 +5,11 @@ class Message < ApplicationRecord
     def self.from_s3(list_name, list_seq)
         client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION)
         obj = client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list_name}/#{list_seq}")
-        self.from_string(obj.body.read)
+
+        m = self.from_string(obj.body.read)
+        m.list_id = List.find_by_name(list_name).id
+        m.list_seq = list_seq
+        m
     end
 
     def self.from_string(str)

@@ -4,8 +4,12 @@ one:
   subject: MyString
   from: MyString
   body: MyText
+  list_id: 1
+  list_seq: 123
 
 two:
   subject: MyString
   from: MyString
   body: MyText
+  list_id: 2
+  list_seq: 234

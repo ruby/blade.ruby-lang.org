@@ -21,7 +21,8 @@ class MessagesController < ApplicationController
     if params[:id]
       @message = Message.find(params[:id])
     else
-      @message = Message.from_s3(params[:list_name], params[:list_seq])
+      list = List.find_by_name(params[:list_name])
+      @message = Message.find_by(list_id: list.id, list_seq: params[:list_seq])
     end
   end
 
