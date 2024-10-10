@@ -7,7 +7,15 @@ OptionParser.new do |opts|
     opts.on('--to TO', Integer)
 end.parse!(into: params)
 
+list = params[:list]
+
 (params[:from]..params[:to]).each do |seq|
-    message = Message.from_s3(params[:list], seq)
-    message.save
+    begin
+        message = Message.from_s3(list, seq)
+        message.save
+    rescue ActiveRecord::RecordNotUnique
+        STDERR.puts("#{list}:#{seq} already exists")
+    rescue Aws::S3::Errors::NoSuchKey
+        STDERR.puts("#{list}:#{seq} doesn't exist")
+    end
 end
