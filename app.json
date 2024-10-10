@@ -1,0 +1,7 @@
+{
+    "scripts": {
+      "postdeploy": "bin/heroku-postdeploy",
+      "pr-predestroy": "bin/heroku-pr-predestroy"
+    }
+  }
+  
