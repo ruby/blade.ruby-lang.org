@@ -15,7 +15,8 @@ class MessagesController < ApplicationController
     # %> and <-> are defined by pg_trgm.
     # https://www.postgresql.org/docs/17/pgtrgm.html
     message_where = if Rails.env.production?
-      Message.where('body %> ? AND list_id IN (?) ORDER BY body <-> ?', query, list_ids, query)
+      Message.where('body %> ? AND list_id IN (?)', query, list_ids)
+        .order(Arel.sql('body <-> ?', query))
     else
       Message.where('body LIKE ? AND list_id IN (?)', "%#{query}%", list_ids)
     end
@@ -36,7 +37,7 @@ class MessagesController < ApplicationController
   def get_list_ids(params)
     list_ids = []
     ['ruby-talk', 'ruby-core', 'ruby-list', 'ruby-dev'].each do |name|
-      if params[name.tr('-', '_').to_sym] == '1'
+      if params[name.tr('-', '_').to_sym] != '0'
         list_ids << List.find_by_name(name).id
       end
     end
