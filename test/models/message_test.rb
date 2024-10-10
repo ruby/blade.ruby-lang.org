@@ -5,11 +5,13 @@ class MessageTest < ActiveSupport::TestCase
     m = Message.from_string(<<END_OF_BODY)
 Subject: [ruby-list:1] Hello
 From: alice@...
-Date: Mon, 01 Jan 2022 12:34:56 +0900
+Date: 2005-12-15T19:32:40+09:00
 
 Hello, world!
 END_OF_BODY
     assert_equal "Hello, world!\n", m.body
     assert_nil m.id
+
+    assert_equal DateTime.parse('2005-12-15T19:32:40+09:00'), m.published_at
   end
 end
