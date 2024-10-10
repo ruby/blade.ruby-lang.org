@@ -6,3 +6,6 @@ Layout:
 
 Metrics/BlockLength:
   Max: 50
+
+Metrics/MethodLength:
+  Max: 40
