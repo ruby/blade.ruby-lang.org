@@ -17,5 +17,7 @@ list = params[:list]
         STDERR.puts("#{list}:#{seq} already exists")
     rescue Aws::S3::Errors::NoSuchKey
         STDERR.puts("#{list}:#{seq} doesn't exist")
+    rescue
+        STDERR.puts("failed to import #{list}:#{seq}")
     end
 end
