@@ -16,7 +16,7 @@
       ].each do |name, label|
     %>
       <span>
-        <%= form.check_box name, {checked: params[name] == '1' } %>
+        <%= form.check_box name, {checked: params[name] != '0' } %>
         <%= form.label name, label %>
       </span>
     <% end %>
