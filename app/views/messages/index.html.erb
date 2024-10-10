@@ -1,14 +1,33 @@
 <p style="color: green"><%= notice %></p>
 
-<h1>Messages</h1>
+<h1>blade.ruby-lang.org</h1>
 
-<ul>
-  <% @messages.each do |message| %>
-    <li>
-      <% list_name = List.find_by_id(message.list_id).name %>
-      <%= list_name %>:<%= message.list_seq %>
-      <%= link_to message.subject, "/#{list_name}/#{message.list_seq}" %>
-      <small><%= message.body %></small>
-    </li>
-  <% end %>
-</ul>
+<%= form_with(method: :get) do |form| %>
+  <%= form.text_field :q, { value: params[:q] }  %>
+  <%= form.submit "Search" %>
+
+  <p>
+    <%
+      [
+        [:ruby_talk, 'ruby-talk (English)'],
+        [:ruby_core, 'ruby-core (For developing Ruby iself, English)'],
+        [:ruby_list, 'ruby-list (Japanese)'],
+        [:ruby_dev, 'ruby-dev (For developing Ruby itself, Japanese)'],
+      ].each do |name, label|
+    %>
+      <span>
+        <%= form.check_box name, {checked: params[name] == '1' } %>
+        <%= form.label name, label %>
+      </span>
+    <% end %>
+  </p>
+<% end %>
+
+<% @messages.each do |message| %>
+  <div>
+    <% list_name = List.find_by_id(message.list_id).name %>
+    <%= list_name %>:<%= message.list_seq %>
+    <%= link_to message.subject, "/#{list_name}/#{message.list_seq}" %>
+    <small><%= message.body %></small>
+  </div>
+<% end %>
