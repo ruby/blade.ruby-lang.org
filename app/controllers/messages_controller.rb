@@ -11,6 +11,9 @@ class MessagesController < ApplicationController
 
     page = params[:page].to_i
     list_ids = get_list_ids(params)
+    if list_ids.empty?
+      raise "Need to select at least one list"
+    end
 
     # %> and <-> are defined by pg_trgm.
     # https://www.postgresql.org/docs/17/pgtrgm.html
