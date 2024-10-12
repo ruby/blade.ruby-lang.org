@@ -1,6 +1,8 @@
 BLADE_BUCKET_REGION = 'ap-northeast-1'
 BLADE_BUCKET_NAME = 'blade.ruby-lang.org'
 
+require 'kconv'
+
 class Message < ApplicationRecord
     # Not really sure we will utlize this configuration,
     # but I don't want to make this column.
@@ -19,8 +21,14 @@ class Message < ApplicationRecord
     end
 
     def self.from_string(str)
-        hs, body = str.encode('utf-8', invalid: :replace).split(/\n\n/, 2)
-        headers = hs.split(/\n/).map { |line|
+        headers_str, body = str.split(/\n\n/, 2)
+
+        # Not really sure this is from the original email, or while making
+        # blade.ruby-lang.org's S3 archive, but there are emails without
+        # a proper Form header, such as ruby-list:2840.
+        headers_str = Kconv.toutf8(headers_str).gsub(/\r\n/, '')
+
+        headers = headers_str.split(/\n/).map { |line|
           line.split(/:\s+/, 2)
         }.to_h
 
