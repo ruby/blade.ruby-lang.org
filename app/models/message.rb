@@ -21,11 +21,14 @@ class Message < ApplicationRecord
     end
 
     def self.from_string(str)
-        headers_str, body = str.split(/\n\n/, 2)
+        # There are a few hacks to import messages from blade.ruby-lang.org's
+        # S3 bucket.
 
-        # Not really sure this is from the original email, or while making
-        # blade.ruby-lang.org's S3 archive, but there are emails without
-        # a proper Form header, such as ruby-list:2840.
+        # Need to call String#b. There are messages that have headers in non-UTF8,
+        # but the body is in UTF-8, such as ruby-list:2882.
+        headers_str, body = str.b.split(/\n\n/, 2)
+
+        # ruby-list:2840 doesn't have a proper From header.
         headers_str = Kconv.toutf8(headers_str).gsub(/\r\n/, '')
 
         headers = headers_str.split(/\n/).map { |line|

@@ -14,10 +14,10 @@ list = params[:list]
         message = Message.from_s3(list, seq)
         message.save
     rescue ActiveRecord::RecordNotUnique
-        STDERR.puts("#{list}:#{seq} already exists")
+        STDERR.puts("#{list}:#{seq} already exists in Postgres")
     rescue Aws::S3::Errors::NoSuchKey
-        STDERR.puts("#{list}:#{seq} doesn't exist")
-    rescue
-        STDERR.puts("failed to import #{list}:#{seq}")
+        STDERR.puts("#{list}:#{seq} doesn't exist in S3")
+    rescue StandardError => e
+        STDERR.puts("failed to import #{list}:#{seq}: #{e}")
     end
 end
