@@ -33,4 +33,13 @@ class Message < ApplicationRecord
             published_at: published_at,
         )
     end
+
+    def reload_from_s3
+        m = self.from_s3(List.find_by_id(self.list_id).name, self.list_seq)
+
+        self.body = m.body
+        self.subject = m.subject
+        self.from = from
+        self.published_at = m.published_at
+    end
 end
