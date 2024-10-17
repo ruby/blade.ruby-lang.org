@@ -10,9 +10,8 @@ class Message < ApplicationRecord
     # https://blade.ruby-lang.org/ruby-talk/410000 is not.
     self.skip_time_zone_conversion_for_attributes = [:published_at]
 
-    def self.from_s3(list_name, list_seq)
-        client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION)
-        obj = client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list_name}/#{list_seq}")
+    def self.from_s3(list_name, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
+        obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list_name}/#{list_seq}")
 
         m = self.from_string(obj.body.read)
         m.list_id = List.find_by_name(list_name).id
