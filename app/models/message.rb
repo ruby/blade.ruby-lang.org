@@ -37,19 +37,21 @@ class Message < ApplicationRecord
         published_at = DateTime.strptime(headers['Date'], '%Y-%m-%dT%H:%M:%S%:z')
 
         self.new(
-            body: body,
+            body: Kconv.toutf8(body),
             subject: headers['Subject'],
             from: headers['From'],
             published_at: published_at,
         )
     end
 
-    def reload_from_s3
-        m = self.from_s3(List.find_by_id(self.list_id).name, self.list_seq)
+    def reload_from_s3(s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
+        m = Message.from_s3(List.find_by_id(self.list_id).name, self.list_seq, s3_client)
 
         self.body = m.body
         self.subject = m.subject
         self.from = from
         self.published_at = m.published_at
+
+        m
     end
 end

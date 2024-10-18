@@ -2,32 +2,36 @@
 
 <h1>blade.ruby-lang.org</h1>
 
-<%= form_with(method: :get) do |form| %>
-  <%= form.text_field :q, { value: params[:q] }  %>
-  <%= form.submit "Search" %>
+<div class="search">
+  <%= form_with(method: :get) do |form| %>
+    <%= form.text_field :q, { value: params[:q] }  %>
+    <%= form.submit "Search" %>
 
-  <p>
-    <%
-      [
-        [:ruby_talk, 'ruby-talk (English)'],
-        [:ruby_core, 'ruby-core (For developing Ruby iself, English)'],
-        [:ruby_list, 'ruby-list (Japanese)'],
-        [:ruby_dev, 'ruby-dev (For developing Ruby itself, Japanese)'],
-      ].each do |name, label|
-    %>
-      <span>
-        <%= form.check_box name, {checked: params[name] != '0' } %>
-        <%= form.label name, label %>
-      </span>
-    <% end %>
-  </p>
-<% end %>
+    <p>
+      <%
+        [
+          [:ruby_talk, 'ruby-talk (English)'],
+          [:ruby_core, 'ruby-core (For developing Ruby iself, English)'],
+          [:ruby_list, 'ruby-list (Japanese)'],
+          [:ruby_dev, 'ruby-dev (For developing Ruby itself, Japanese)'],
+        ].each do |name, label|
+      %>
+        <span>
+          <%= form.check_box name, {checked: params[name] != '0' } %>
+          <%= form.label name, label %>
+        </span>
+      <% end %>
+    </p>
+  <% end %>
+</div>
 
 <% @messages.each do |message| %>
-  <div>
+  <div class="search-result">
     <% list_name = List.find_by_id(message.list_id).name %>
-    <%= list_name %>:<%= message.list_seq %>
-    <%= link_to message.subject, "/#{list_name}/#{message.list_seq}" %>
-    <small><%= message.body %></small>
+    <h2 class="subject">
+      <span class="prefix"><%= list_name %>:<%= message.list_seq %></span>
+      <%= link_to without_list_prefix(message.subject), "/#{list_name}/#{message.list_seq}" %>
+    </h2>
+    <div class="snippet"><%= search_snippet(message.body, params[:q]) %></div>
   </div>
 <% end %>

@@ -1,14 +1,10 @@
-<div id="<%= dom_id message %>">
-  <p>
-    <strong>Subject:</strong>
-    <%= message.subject %>
-  </p>
+<% content_for :title, message.subject %>
 
-  <p>
-    <strong>From:</strong>
-    <%= message.from %>
-  </p>
-
+<div class="message" id="<%= dom_id message %>">
+  <ul class="headers">
+    <li>From: <%= message.from %></li>
+    <li>Date: <%= message.published_at %></li>
+    <li>Subject: <%= message.subject %></li>
+  </ul>
   <pre><%= message.body %></pre>
-
 </div>
