@@ -26,4 +26,21 @@ Hello, world!
 END_OF_BODY
     Message.from_s3('ruby-list', 1234, s3_client)
   end
+
+  test 'reload_from_s3' do
+    s3_client = Aws::S3::Client.new(stub_responses: true)
+    s3_client.stub_responses(:get_object, body: <<END_OF_BODY)
+Subject: [ruby-list:1] Hello
+From: alice@...
+Date: 2005-12-15T19:32:40+09:00
+
+Hello, world!
+END_OF_BODY
+
+    m = Message.new
+    m.list_id = 1
+    m.list_seq = 1
+    m.reload_from_s3(s3_client)
+    assert_equal '[ruby-list:1] Hello', m.subject
+  end
 end
