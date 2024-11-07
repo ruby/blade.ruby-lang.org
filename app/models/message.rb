@@ -2,6 +2,7 @@ BLADE_BUCKET_REGION = 'ap-northeast-1'
 BLADE_BUCKET_NAME = 'blade.ruby-lang.org'
 
 require 'kconv'
+require 'mechanize'
 
 class Message < ApplicationRecord
     # Not really sure we will utlize this configuration,
@@ -14,6 +15,15 @@ class Message < ApplicationRecord
         obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list_name}/#{list_seq}")
 
         m = self.from_string(obj.body.read)
+        m.list_id = List.find_by_name(list_name).id
+        m.list_seq = list_seq
+        m
+    end
+
+    def self.from_web(list_name, list_seq, web_client = Mechanize.new)
+        obj = web_client.get("https://blade.ruby-lang.org/#{list_name}/#{list_seq}")
+
+        m = self.from_string(obj.body)
         m.list_id = List.find_by_name(list_name).id
         m.list_seq = list_seq
         m
