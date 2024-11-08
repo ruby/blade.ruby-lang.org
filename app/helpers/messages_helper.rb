@@ -1,6 +1,6 @@
 module MessagesHelper
     def without_list_prefix(subject)
-        subject.sub(/^\[(ruby-core|ruby-list|ruby-talk|ruby-dev).+\]\s/, '')
+        subject.sub(/^\[(ruby-core|ruby-list|ruby-talk|ruby-dev).+?\]\s/, '')
     end
 
     MARGIN = 50
