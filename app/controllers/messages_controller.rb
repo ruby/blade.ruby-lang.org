@@ -12,14 +12,10 @@ class MessagesController < ApplicationController
     render :search
   end
 
-  # GET /messages/1
+  # GET /messages/ruby-dev/1
   def show
-    if params[:id]
-      @message = Message.find(params[:id])
-    else
-      list = List.find_by_name(params[:list_name])
-      @message = Message.find_by(list_id: list.id, list_seq: params[:list_seq])
-    end
+    list = List.find_by_name(params[:list_name])
+    @message = Message.find_by(list_id: list.id, list_seq: params[:list_seq])
   end
 
   private
