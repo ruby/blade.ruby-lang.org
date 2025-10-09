@@ -1,7 +1,7 @@
 class MessagesController < ApplicationController
   PER_PAGE = 50
 
-  # GET /messages or /messages.json
+  # GET /messages
   def index
     query = params[:q]
     unless query
@@ -26,7 +26,7 @@ class MessagesController < ApplicationController
     @messages = message_where.offset(page * PER_PAGE).limit(PER_PAGE)
   end
 
-  # GET /messages/1 or /messages/1.json
+  # GET /messages/1
   def show
     if params[:id]
       @message = Message.find(params[:id])
