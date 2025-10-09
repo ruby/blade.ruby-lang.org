@@ -6,6 +6,8 @@ class MessagesController < ApplicationController
     query = params[:q]
     unless query
       @messages = []
+
+      render :search
       return
     end
 
@@ -24,6 +26,8 @@ class MessagesController < ApplicationController
       Message.where('body LIKE ? AND list_id IN (?)', "%#{query}%", list_ids)
     end
     @messages = message_where.offset(page * PER_PAGE).limit(PER_PAGE)
+
+    render :search
   end
 
   # GET /messages/1
