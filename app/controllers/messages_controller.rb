@@ -3,13 +3,18 @@ class MessagesController < ApplicationController
 
   # GET /messages
   def index
-    if (query = params[:q])
+    if (list_name = params[:list_name])
+      @list = List.find_by_name list_name
+      @messages = Message.where(list_id: @list.id).order(:id)
+    elsif (query = params[:q])
       search query
+
+      render :search
     else
       @messages = []
-    end
 
-    render :search
+      render :search
+    end
   end
 
   # GET /messages/ruby-dev/1
