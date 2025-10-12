@@ -1,0 +1,22 @@
+<div class="thread-message" style="margin-left: <%= depth * 20 %>px;">
+  <% if depth == 0 %>
+    <h2>
+      <span><%= message.list_seq %>: (<%= message.count_recursively %>)</span>
+      <%= link_to without_list_prefix(message.subject), "/#{list.name}/#{message.list_seq}" %>
+    </h2>
+  <% else %>
+    <div class="reply">
+      <span class="reply-meta">
+        <%= link_to "[#{message.list_seq}]", "/#{list.name}/#{message.list_seq}" %>
+        <%= without_list_prefix(message.subject) %>
+        - <%= message.from&.first || message.from %>
+      </span>
+    </div>
+  <% end %>
+
+  <% if message.children&.any? %>
+    <% message.children.each do |child| %>
+      <%= render partial: 'thread', locals: { message: child, list: list, depth: depth + 1 } %>
+    <% end %>
+  <% end %>
+</div>

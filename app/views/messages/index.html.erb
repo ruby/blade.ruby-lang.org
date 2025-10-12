@@ -10,4 +10,6 @@
     <%= link_to without_list_prefix(message.subject), "/#{@list.name}/#{message.list_seq}" %>— <%= message.from %>
   </h2>
   <div><pre><%= message.body %></pre></div>
+
+  <%= render partial: 'thread', locals: { message: message, list: @list, depth: 0 } %>
 <% end %>
