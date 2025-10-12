@@ -10,6 +10,8 @@ class Message < ApplicationRecord
   # https://blade.ruby-lang.org/ruby-talk/410000 is not.
   self.skip_time_zone_conversion_for_attributes = [:published_at]
 
+  attr_accessor :children
+
   class << self
     def from_mail(mail, list, list_seq)
       body = Kconv.toutf8 mail.body.raw_source
@@ -83,6 +85,10 @@ class Message < ApplicationRecord
         published_at: published_at,
       )
     end
+  end
+
+  def count_recursively(count = 0)
+    count + 1 + (children&.sum(&:count_recursively) || 0)
   end
 
   def reload_from_s3(s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
