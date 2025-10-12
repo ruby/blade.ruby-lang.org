@@ -1,6 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html class="dark">
   <head>
+    <script>
+      // Dark mode detection
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    </script>
     <title><%=
       if yield(:title).empty?
         'blade.ruby-lang.org'
@@ -16,11 +24,11 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   </head>
 
-  <body class="bg-gray-50">
-    <header class="bg-white shadow-sm border-b border-gray-200">
+  <body class="bg-gray-50 dark:bg-gray-900">
+    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
       <div class="container mx-auto px-4 py-4">
-        <h1 class="text-2xl font-bold text-gray-900">
-          <%= link_to "blade.ruby-lang.org", root_path, class: "hover:text-red-600 transition-colors" %>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          <%= link_to "blade.ruby-lang.org", root_path, class: "hover:text-red-600 dark:hover:text-red-400 transition-colors" %>
         </h1>
       </div>
     </header>
