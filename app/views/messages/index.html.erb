@@ -6,7 +6,7 @@
 
 <% @messages.each do |message| %>
   <h2>
-    <span><%= message.list_seq %>:</span>
+    <span><%= message.list_seq %>: (<%= message.count_recursively %>)</span>
     <%= link_to without_list_prefix(message.subject), "/#{@list.name}/#{message.list_seq}" %>— <%= message.from %>
   </h2>
   <div><pre><%= message.body %></pre></div>
