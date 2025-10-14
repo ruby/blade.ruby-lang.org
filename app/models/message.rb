@@ -10,6 +10,8 @@ class Message < ApplicationRecord
   # https://blade.ruby-lang.org/ruby-talk/410000 is not.
   self.skip_time_zone_conversion_for_attributes = [:published_at]
 
+  has_many_attached :attachments
+
   attr_accessor :children
 
   class << self
