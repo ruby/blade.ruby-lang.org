@@ -15,6 +15,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_17_161507) do
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
 
+  create_table "active_storage_file_blobs", force: :cascade do |t|
+    t.string "key"
+    t.binary "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_active_storage_file_blobs_on_key", unique: true
+  end
+
   create_table "messages", force: :cascade do |t|
     t.string "subject"
     t.string "from"
