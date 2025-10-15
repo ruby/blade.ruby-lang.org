@@ -3,12 +3,38 @@ class MessagesController < ApplicationController
 
   # GET /messages
   def index
-    query = params[:q]
-    unless query
+    if (query = params[:q])
+      search query
+    else
       @messages = []
-      return
     end
 
+    render :search
+  end
+
+  # GET /messages/1
+  def show
+    if params[:id]
+      @message = Message.find(params[:id])
+    else
+      list = List.find_by_name(params[:list_name])
+      @message = Message.find_by(list_id: list.id, list_seq: params[:list_seq])
+    end
+  end
+
+  private
+
+  def get_list_ids(params)
+    list_ids = []
+    ['ruby-talk', 'ruby-core', 'ruby-list', 'ruby-dev'].each do |name|
+      if params[name.tr('-', '_').to_sym] != '0'
+        list_ids << List.find_by_name(name).id
+      end
+    end
+    list_ids
+  end
+
+  def search(query)
     page = params[:page].to_i
     list_ids = get_list_ids(params)
     if list_ids.empty?
@@ -24,26 +50,5 @@ class MessagesController < ApplicationController
       Message.where('body LIKE ? AND list_id IN (?)', "%#{query}%", list_ids)
     end
     @messages = message_where.offset(page * PER_PAGE).limit(PER_PAGE)
-  end
-
-  # GET /messages/1
-  def show
-    if params[:id]
-      @message = Message.find(params[:id])
-    else
-      list = List.find_by_name(params[:list_name])
-      @message = Message.find_by(list_id: list.id, list_seq: params[:list_seq])
-    end
-  end
-
-  private
-  def get_list_ids(params)
-    list_ids = []
-    ['ruby-talk', 'ruby-core', 'ruby-list', 'ruby-dev'].each do |name|
-      if params[name.tr('-', '_').to_sym] != '0'
-        list_ids << List.find_by_name(name).id
-      end
-    end
-    list_ids
   end
 end
