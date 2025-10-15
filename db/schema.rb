@@ -11,6 +11,10 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.1].define(version: 2024_10_10_062050) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_trgm"
+  enable_extension "plpgsql"
+
   create_table "messages", force: :cascade do |t|
     t.string "subject"
     t.string "from"
@@ -19,8 +23,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_10_062050) do
     t.datetime "updated_at", null: false
     t.integer "list_id"
     t.integer "list_seq"
-    t.datetime "published_at", precision: nil
-    t.index ["body"], name: "index_messages_on_body"
+    t.timestamptz "published_at"
+    t.index ["body"], name: "index_messages_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["list_id", "list_seq"], name: "index_messages_on_list_id_and_list_seq", unique: true
   end
 
