@@ -1,3 +1,10 @@
+AllCops:
+  Exclude:
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+    - 'coverage/**/*'
+    - 'db/migrate/20251010175058_add_service_name_to_active_storage_blobs.active_storage.rb'
+
 Style:
   Enabled: false
 
