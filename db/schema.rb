@@ -24,6 +24,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_175060) do
     t.integer "list_id"
     t.integer "list_seq"
     t.timestamptz "published_at"
+    t.string "message_id_header"
+    t.integer "parent_id"
     t.index ["body"], name: "index_messages_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["list_id", "list_seq"], name: "index_messages_on_list_id_and_list_seq", unique: true
   end
