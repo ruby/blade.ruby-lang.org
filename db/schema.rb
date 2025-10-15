@@ -21,6 +21,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_10_10_062050) do
     t.integer "list_seq"
     t.datetime "published_at", precision: nil
     t.index ["body"], name: "index_messages_on_body"
+    t.index ["list_id", "list_seq"], name: "index_messages_on_list_id_and_list_seq", unique: true
   end
 
 end
