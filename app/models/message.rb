@@ -15,7 +15,24 @@ class Message < ApplicationRecord
       body = Kconv.toutf8 mail.body.raw_source
       subject = Kconv.toutf8 mail.subject
       from = mail.from_address.decoded
-      new list_id: list.id, list_seq: list_seq, body: body, subject: subject, from: from, published_at: mail.date, message_id_header: mail.message_id
+
+      # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
+      parent_message_id = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
+      parent_message = Message.find_by message_id_header: parent_message_id if parent_message_id
+      if !parent_message && (String === mail.references)
+        parent_message = Message.find_by message_id_header: mail.references
+      end
+      if !parent_message && (Array === mail.references)
+        mail.references.compact.each do |ref|
+          break if (parent_message = Message.find_by message_id_header: ref)
+        end
+      end
+
+      new list_id: list.id, list_seq: list_seq, body: body, subject: subject, from: from, published_at: mail.date, message_id_header: mail.message_id, parent_id: parent_message&.id
+    end
+
+    private def extract_message_id_from_in_reply_to(header)
+      header && header.strip.scan(/<([^>]+)>/).flatten.first
     end
 
     def from_s3(list_name, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
