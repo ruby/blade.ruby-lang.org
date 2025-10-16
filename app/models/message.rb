@@ -16,6 +16,8 @@ class Message < ApplicationRecord
         mail.body.decoded.encode Encoding::UTF_8, Encoding::ISO_2022_JP
       rescue Encoding::InvalidByteSequenceError
         mail.body.decoded.encode Encoding::UTF_8, Encoding::ISO_2022_JP, invalid: :replace, undef: :replace
+      rescue Encoding::UndefinedConversionError
+        mail.decoded
       end
 
       from = mail.from_address.decoded
