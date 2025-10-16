@@ -13,7 +13,8 @@ class Message < ApplicationRecord
   class << self
     def from_mail(mail, list, list_seq)
       body = mail.body.decoded.encode Encoding::UTF_8, Encoding::ISO_2022_JP
-      new list_id: list.id, list_seq: list_seq, body: body, subject: mail.subject, from: mail.from, published_at: mail.date, message_id_header: mail.message_id
+      from = mail.from_address.decoded
+      new list_id: list.id, list_seq: list_seq, body: body, subject: mail.subject, from: from, published_at: mail.date, message_id_header: mail.message_id
     end
 
     def from_s3(list_name, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
