@@ -12,14 +12,7 @@ class Message < ApplicationRecord
 
   class << self
     def from_mail(mail, list, list_seq)
-      body = begin
-        mail.body.decoded.encode Encoding::UTF_8, Encoding::ISO_2022_JP
-      rescue Encoding::InvalidByteSequenceError
-        mail.body.decoded.encode Encoding::UTF_8, Encoding::ISO_2022_JP, invalid: :replace, undef: :replace
-      rescue Encoding::UndefinedConversionError
-        mail.decoded
-      end
-
+      body = Kconv.toutf8 mail.body.raw_source
       from = mail.from_address.decoded
       new list_id: list.id, list_seq: list_seq, body: body, subject: mail.subject, from: from, published_at: mail.date, message_id_header: mail.message_id
     end
