@@ -11,6 +11,10 @@ class Message < ApplicationRecord
   self.skip_time_zone_conversion_for_attributes = [:published_at]
 
   class << self
+    def from_mail(mail, list, list_seq)
+      new list_id: list.id, list_seq: list_seq, body: mail.body.decoded, subject: mail.subject, from: mail.from, published_at: mail.date, message_id_header: mail.message_id
+    end
+
     def from_s3(list_name, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
       obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list_name}/#{list_seq}")
 

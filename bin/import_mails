@@ -19,7 +19,7 @@ Message.transaction do
     begin
       str = File.binread BASE_DIR.join(list.name, seq.to_s)
       mail = Mail.read_from_string str
-      message = Message.new list_id: list.id, list_seq: seq, body: mail.body.decoded, subject: mail.subject, from: mail.from, published_at: mail.date, message_id_header: mail.message_id
+      message = Message.from_mail mail, list, seq
       message.save!
     rescue ActiveRecord::RecordNotUnique
       STDERR.puts("#{list}:#{seq} already exists in Postgres")
