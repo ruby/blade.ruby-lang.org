@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'mail'
+
+BASE_DIR = Rails.root.join('tmp')
+
+params = {}
+OptionParser.new do |opts|
+  opts.on('--list LIST')
+  opts.on('--from FROM', Integer)
+  opts.on('--to TO', Integer)
+end.parse!(into: params)
+
+list = List.find_by_name(params[:list])
+
+Message.transaction do
+  (params[:from]..params[:to]).each do |seq|
+    begin
+      str = File.binread BASE_DIR.join(list.name, seq.to_s)
+      mail = Mail.read_from_string str
+      message = Message.new list_id: list.id, list_seq: seq, body: mail.body.decoded, subject: mail.subject, from: mail.from, published_at: mail.date, message_id_header: mail.message_id
+      message.save!
+    rescue ActiveRecord::RecordNotUnique
+      STDERR.puts("#{list}:#{seq} already exists in Postgres")
+    rescue StandardError => e
+      STDERR.puts("failed to import #{list}:#{seq}: #{e}")
+    end
+  end
+end
