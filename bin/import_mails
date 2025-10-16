@@ -17,7 +17,12 @@ list = List.find_by_name(params[:list])
 Message.transaction do
   (params[:from]..params[:to]).each do |seq|
     begin
-      str = File.binread BASE_DIR.join(list.name, seq.to_s)
+      filepath = BASE_DIR.join(list.name, seq.to_s)
+      next unless filepath.exist?
+
+      str = File.binread filepath
+      next if str.blank?
+
       mail = Mail.read_from_string str
       message = Message.from_mail mail, list, seq
       message.save!
