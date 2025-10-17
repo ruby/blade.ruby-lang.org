@@ -18,6 +18,9 @@ class Message < ApplicationRecord
       end
       subject = Kconv.toutf8 mail.subject
       from = mail.from_address.decoded
+      if (list.name == 'ruby-dev') && (list_seq == 13859)
+        from = Kconv.toutf8 from
+      end
 
       # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
       parent_message_id = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
