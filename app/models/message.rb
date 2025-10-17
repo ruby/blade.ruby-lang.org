@@ -13,6 +13,9 @@ class Message < ApplicationRecord
   class << self
     def from_mail(mail, list, list_seq)
       body = Kconv.toutf8 mail.body.raw_source
+      if (list.name == 'ruby-dev') && (list_seq == 13859)
+        body.gsub!("\u0000", '')
+      end
       subject = Kconv.toutf8 mail.subject
       from = mail.from_address.decoded
 
