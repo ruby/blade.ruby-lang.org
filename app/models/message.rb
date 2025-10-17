@@ -13,7 +13,7 @@ class Message < ApplicationRecord
   class << self
     def from_mail(mail, list, list_seq)
       body = Kconv.toutf8 mail.body.raw_source
-      if (list.name == 'ruby-dev') && (list_seq == 13859)
+      if ((list.name == 'ruby-dev') && list_seq.in?([13859, 26229, 39731, 39734])) || ((list.name == 'ruby-core') && list_seq.in?([5231])) || ((list.name == 'ruby-list') && list_seq.in?([29637, 29711, 30148])) || ((list.name == 'ruby-talk') && list_seq.in?([5198, 61316]))
         body.gsub!("\u0000", '')
       end
       subject = Kconv.toutf8 mail.subject
