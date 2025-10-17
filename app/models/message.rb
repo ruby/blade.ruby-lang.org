@@ -16,7 +16,8 @@ class Message < ApplicationRecord
       if ((list.name == 'ruby-dev') && list_seq.in?([13859, 26229, 39731, 39734])) || ((list.name == 'ruby-core') && list_seq.in?([5231])) || ((list.name == 'ruby-list') && list_seq.in?([29637, 29711, 30148])) || ((list.name == 'ruby-talk') && list_seq.in?([5198, 61316]))
         body.gsub!("\u0000", '')
       end
-      subject = Kconv.toutf8 mail.subject
+      subject = mail.subject
+      subject = Kconv.toutf8 subject if subject
       from = mail.from_address&.decoded
       if !from && (list.name == 'ruby-core') && (list_seq == 161)
         from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
