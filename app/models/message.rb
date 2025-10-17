@@ -17,7 +17,7 @@ class Message < ApplicationRecord
         body.gsub!("\u0000", '')
       end
       subject = Kconv.toutf8 mail.subject
-      from = mail.from_address.decoded
+      from = mail.from_address&.decoded
       if (list.name == 'ruby-dev') && (list_seq == 13859)
         from = Kconv.toutf8 from
       end
