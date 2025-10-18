@@ -29,6 +29,8 @@ class Message < ApplicationRecord
         from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
       end
 
+      message_id = mail.message_id.encode Encoding::UTF_8, invalid: :replace, undef: :replace
+
       # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
       parent_message_id = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
       parent_message = Message.find_by message_id_header: parent_message_id if parent_message_id
@@ -41,7 +43,7 @@ class Message < ApplicationRecord
         end
       end
 
-      new list_id: list.id, list_seq: list_seq, body: body, subject: subject, from: from, published_at: mail.date, message_id_header: mail.message_id, parent_id: parent_message&.id
+      new list_id: list.id, list_seq: list_seq, body: body, subject: subject, from: from, published_at: mail.date, message_id_header: message_id, parent_id: parent_message&.id
     end
 
     private def extract_message_id_from_in_reply_to(header)
