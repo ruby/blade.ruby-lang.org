@@ -19,6 +19,9 @@ class Message < ApplicationRecord
       if (list.name == 'ruby-list') && list_seq.in?([37565, 38116, 43106])
         mail.header[:subject].value.chop!
       end
+      if (list.name == 'ruby-list') && (list_seq.in?([41850, 43710]))
+        mail.header[:subject].value = Kconv.toutf8 mail.header[:subject].value
+      end
       subject = mail.subject
       subject = Kconv.toutf8 subject if subject
       from = Kconv.toutf8 mail.from_address&.raw
