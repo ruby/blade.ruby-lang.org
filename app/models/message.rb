@@ -16,6 +16,9 @@ class Message < ApplicationRecord
       if ((list.name == 'ruby-dev') && list_seq.in?([13859, 26229, 39731, 39734])) || ((list.name == 'ruby-core') && list_seq.in?([5231])) || ((list.name == 'ruby-list') && list_seq.in?([29637, 29711, 30148])) || ((list.name == 'ruby-talk') && list_seq.in?([5198, 61316]))
         body.gsub!("\u0000", '')
       end
+      if (list.name == 'ruby-list') && list_seq.in?([37565, 38116, 43106])
+        mail.header[:subject].value.chop!
+      end
       subject = mail.subject
       subject = Kconv.toutf8 subject if subject
       from = Kconv.toutf8 mail.from_address&.raw
