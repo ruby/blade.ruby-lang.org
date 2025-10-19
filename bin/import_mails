@@ -14,6 +14,8 @@ end.parse!(into: params)
 
 list = List.find_by_name(params[:list])
 
+errors = []
+
 Message.transaction do
   (params[:from]..params[:to]).each do |seq|
     begin
@@ -29,7 +31,10 @@ Message.transaction do
     rescue ActiveRecord::RecordNotUnique
       STDERR.puts("#{list}:#{seq} already exists in Postgres")
     rescue StandardError => e
+      errors << [seq, e]
       STDERR.puts("failed to import #{list}:#{seq}: #{e}")
     end
   end
 end
+
+pp errors if errors.any?
