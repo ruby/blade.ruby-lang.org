@@ -16,6 +16,8 @@ list = List.find_by_name(params[:list])
 
 errors = []
 
+Rails.logger.level = Logger::INFO
+
 Message.transaction do
   (params[:from]..params[:to]).each do |seq|
     begin
