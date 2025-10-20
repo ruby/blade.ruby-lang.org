@@ -29,7 +29,7 @@ class Message < ApplicationRecord
         from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
       end
 
-      message_id = mail.message_id.encode Encoding::UTF_8, invalid: :replace, undef: :replace
+      message_id = mail.message_id&.encode Encoding::UTF_8, invalid: :replace, undef: :replace
 
       # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
       parent_message_id = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
