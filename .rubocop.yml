@@ -11,11 +11,5 @@ Style:
 Layout:
   Enabled: false
 
-Metrics/BlockLength:
-  Max: 50
-
-Metrics/MethodLength:
-  Max: 40
-
-Metrics/AbcSize:
-  Max: 50
+Metrics:
+  Enabled: false
