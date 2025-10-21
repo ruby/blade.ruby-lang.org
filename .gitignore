@@ -35,3 +35,6 @@
 /config/master.key
 
 /coverage
+
+/app/assets/builds/*
+!/app/assets/builds/.keep
