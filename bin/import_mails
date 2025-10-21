@@ -34,7 +34,7 @@ Message.transaction do
       STDERR.puts("#{list}:#{seq} already exists in Postgres")
     rescue StandardError => e
       errors << [seq, e]
-      STDERR.puts("failed to import #{list}:#{seq}: #{e}")
+      STDERR.puts("failed to import #{list.name}:#{seq}: #{e}")
     end
   end
 end
