@@ -35,13 +35,13 @@ class Message < ApplicationRecord
 
       # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
       parent_message_id_header = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
-      parent_message_id = Message.where(message_id_header: parent_message_id_header).pick(:id) if parent_message_id_header
+      parent_message_id = Message.where(list_id: list.id, message_id_header: parent_message_id_header).pick(:id) if parent_message_id_header
       if !parent_message_id && (String === mail.references)
-        parent_message_id = Message.where(message_id_header: mail.references).pick(:id)
+        parent_message_id = Message.where(list_id: list.id, message_id_header: mail.references).pick(:id)
       end
       if !parent_message_id && (Array === mail.references)
         mail.references.compact.each do |ref|
-          break if (parent_message_id = Message.where(message_id_header: ref).pick(:id))
+          break if (parent_message_id = Message.where(list_id: list.id, message_id_header: ref).pick(:id))
         end
       end
 
