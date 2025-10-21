@@ -87,6 +87,10 @@ class Message < ApplicationRecord
     end
   end
 
+  def list
+    @list ||= List.find_by_id(list_id)
+  end
+
   def count_recursively(count = 0)
     count + 1 + (children&.sum(&:count_recursively) || 0)
   end
