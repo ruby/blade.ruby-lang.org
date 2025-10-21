@@ -18,12 +18,9 @@ class Message < ApplicationRecord
       end
       subject = mail.subject
       subject = Kconv.toutf8 subject if subject
-      from = mail.from_address&.decoded
+      from = Kconv.toutf8 mail.from_address.raw
       if !from && (list.name == 'ruby-core') && (list_seq == 161)
         from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
-      end
-      if (list.name == 'ruby-dev') && (list_seq == 13859)
-        from = Kconv.toutf8 from
       end
 
       # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
