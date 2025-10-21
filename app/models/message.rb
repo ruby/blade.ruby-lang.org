@@ -21,7 +21,14 @@ class Message < ApplicationRecord
   def from_mail(mail, list, list_seq)
     self.list_id, self.list_seq, self.published_at = list.id, list_seq, mail.date
 
-    self.body = Kconv.toutf8 mail.body.raw_source
+    if mail.multipart?
+      mail.parts.each do |p|
+        handle_multipart p
+      end
+    else
+      self.body = Kconv.toutf8 mail.body.raw_source
+    end
+
     if ((list.name == 'ruby-dev') && list_seq.in?([13859, 26229, 39731, 39734])) || ((list.name == 'ruby-core') && list_seq.in?([5231])) || ((list.name == 'ruby-list') && list_seq.in?([29637, 29711, 30148])) || ((list.name == 'ruby-talk') && list_seq.in?([5198, 61316]))
       self.body.gsub!("\u0000", '')
     end
@@ -55,6 +62,17 @@ class Message < ApplicationRecord
     end
 
     self
+  end
+
+  private def handle_multipart(part)
+    case part.content_type.downcase
+    when /^text\/plain/
+      (self.body ||= '') << Kconv.toutf8(part.body.raw_source)
+    when /^text\/html;/
+      (self.html_body ||= '') << Kconv.toutf8(part.body.raw_source)
+    else
+      puts "Unknown content_type: #{part.content_type}"
+    end
   end
 
   private def extract_message_id_from_in_reply_to(header)
