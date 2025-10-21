@@ -1,6 +1,20 @@
 require "test_helper"
 
 class MessageTest < ActiveSupport::TestCase
+  test 'from_mail' do
+    mail = Mail.read_from_string(<<END_OF_BODY)
+Subject: [ruby-list:1] Hello
+From: alice@example.com
+Date: 2005-12-15T19:32:40+09:00
+
+Hello, world!
+END_OF_BODY
+    m = Message.from_mail(mail, List.find_by_name('ruby-list'), 1)
+    assert_equal "Hello, world!\r\n", m.body
+
+    assert_equal DateTime.parse('2005-12-15T19:32:40+09:00'), m.published_at
+  end
+
   test 'from_string' do
     m = Message.from_string(<<END_OF_BODY)
 Subject: [ruby-list:1] Hello

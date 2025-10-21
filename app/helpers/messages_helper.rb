@@ -1,6 +1,6 @@
 module MessagesHelper
   def without_list_prefix(subject)
-    subject.sub(/^\[.+?\]\s*/, '')
+    subject&.sub(/^\[.+?\]\s*/, '')
   end
 
   MARGIN = 50
