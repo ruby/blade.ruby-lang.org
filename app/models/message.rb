@@ -18,7 +18,7 @@ class Message < ApplicationRecord
       end
       subject = mail.subject
       subject = Kconv.toutf8 subject if subject
-      from = Kconv.toutf8 mail.from_address.raw
+      from = Kconv.toutf8 mail.from_address&.raw
       if !from && (list.name == 'ruby-core') && (list_seq == 161)
         from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
       end
