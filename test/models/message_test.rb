@@ -9,9 +9,8 @@ Date: 2005-12-15T19:32:40+09:00
 
 Hello, world!
 END_OF_BODY
-
     m = Message.from_mail(mail, List.find_by_name('ruby-list'), 1)
-    assert_equal "Hello, world!\n", m.body
+    assert_equal "Hello, world!\r\n", m.body
 
     assert_equal DateTime.parse('2005-12-15T19:32:40+09:00'), m.published_at
   end
