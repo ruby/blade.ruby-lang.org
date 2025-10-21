@@ -72,7 +72,7 @@ class Message < ApplicationRecord
       attachments.attach(io: file, filename: part.filename, content_type: part.content_type)
     else
       case part.content_type.downcase
-      when /^text\/plain/
+      when /^text\/plain/, /text\/enriched;/
         (self.body ||= '') << Kconv.toutf8(part.body.raw_source)
       when /^text\/html;/
         (self.html_body ||= '') << Kconv.toutf8(part.body.raw_source)
