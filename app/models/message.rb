@@ -67,13 +67,18 @@ class Message < ApplicationRecord
   end
 
   private def handle_multipart(part)
-    case part.content_type.downcase
-    when /^text\/plain/
-      (self.body ||= '') << Kconv.toutf8(part.body.raw_source)
-    when /^text\/html;/
-      (self.html_body ||= '') << Kconv.toutf8(part.body.raw_source)
+    if part.attachment?
+      file = StringIO.new(part.decoded)
+      attachments.attach(io: file, filename: part.filename, content_type: part.content_type)
     else
-      puts "Unknown content_type: #{part.content_type}"
+      case part.content_type.downcase
+      when /^text\/plain/
+        (self.body ||= '') << Kconv.toutf8(part.body.raw_source)
+      when /^text\/html;/
+        (self.html_body ||= '') << Kconv.toutf8(part.body.raw_source)
+      else
+        puts "Unknown content_type: #{part.content_type}"
+      end
     end
   end
 
