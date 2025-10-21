@@ -14,44 +14,54 @@ class Message < ApplicationRecord
 
   class << self
     def from_mail(mail, list, list_seq)
-      body = Kconv.toutf8 mail.body.raw_source
-      if ((list.name == 'ruby-dev') && list_seq.in?([13859, 26229, 39731, 39734])) || ((list.name == 'ruby-core') && list_seq.in?([5231])) || ((list.name == 'ruby-list') && list_seq.in?([29637, 29711, 30148])) || ((list.name == 'ruby-talk') && list_seq.in?([5198, 61316]))
-        body.gsub!("\u0000", '')
-      end
-      if (list.name == 'ruby-list') && list_seq.in?([37565, 38116, 43106])
-        mail.header[:subject].value.chop!
-      end
-      if (list.name == 'ruby-list') && (list_seq.in?([41850, 43710]))
-        mail.header[:subject].value = Kconv.toutf8 mail.header[:subject].value
-      end
-      subject = mail.subject
-      subject = Kconv.toutf8 subject if subject
-      from = Kconv.toutf8 mail.from_address&.raw
-      if !from && (list.name == 'ruby-core') && (list_seq == 161)
-        from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
-      end
+      new.from_mail(mail, list, list_seq)
+    end
+  end
 
-      message_id = mail.message_id&.encode Encoding::UTF_8, invalid: :replace, undef: :replace
+  def from_mail(mail, list, list_seq)
+    self.list_id, self.list_seq, self.published_at = list.id, list_seq, mail.date
 
-      # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
-      parent_message_id_header = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
-      parent_message_id = Message.where(list_id: list.id, message_id_header: parent_message_id_header).pick(:id) if parent_message_id_header
-      if !parent_message_id && (String === mail.references)
-        parent_message_id = Message.where(list_id: list.id, message_id_header: mail.references).pick(:id)
-      end
-      if !parent_message_id && (Array === mail.references)
-        mail.references.compact.each do |ref|
-          break if (parent_message_id = Message.where(list_id: list.id, message_id_header: ref).pick(:id))
-        end
-      end
-
-      new list_id: list.id, list_seq: list_seq, body: body, subject: subject, from: from, published_at: mail.date, message_id_header: message_id, parent_id: parent_message_id
+    self.body = Kconv.toutf8 mail.body.raw_source
+    if ((list.name == 'ruby-dev') && list_seq.in?([13859, 26229, 39731, 39734])) || ((list.name == 'ruby-core') && list_seq.in?([5231])) || ((list.name == 'ruby-list') && list_seq.in?([29637, 29711, 30148])) || ((list.name == 'ruby-talk') && list_seq.in?([5198, 61316]))
+      self.body.gsub!("\u0000", '')
     end
 
-    private def extract_message_id_from_in_reply_to(header)
-      header && header.strip.scan(/<([^>]+)>/).flatten.first
+    if (list.name == 'ruby-list') && list_seq.in?([37565, 38116, 43106])
+      mail.header[:subject].value.chop!
+    end
+    if (list.name == 'ruby-list') && (list_seq.in?([41850, 43710]))
+      mail.header[:subject].value = Kconv.toutf8 mail.header[:subject].value
+    end
+    self.subject = mail.subject
+    self.subject = Kconv.toutf8 subject if self.subject
+
+    self.from = Kconv.toutf8 mail.from_address&.raw
+    if !self.from && (list.name == 'ruby-core') && (list_seq == 161)
+      self.from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
     end
 
+    self.message_id_header = mail.message_id&.encode Encoding::UTF_8, invalid: :replace, undef: :replace
+
+    # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
+    parent_message_id_header = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
+    self.parent_id = Message.where(list_id: list.id, message_id_header: parent_message_id_header).pick(:id) if parent_message_id_header
+    if !self.parent_id && (String === mail.references)
+      self.parent_id = Message.where(list_id: list.id, message_id_header: mail.references).pick(:id)
+    end
+    if !self.parent_id && (Array === mail.references)
+      mail.references.compact.each do |ref|
+        break if (self.parent_id = Message.where(list_id: list.id, message_id_header: ref).pick(:id))
+      end
+    end
+
+    self
+  end
+
+  private def extract_message_id_from_in_reply_to(header)
+    header && header.strip.scan(/<([^>]+)>/).flatten.first
+  end
+
+  class << self
     def from_s3(list_name, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
       obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list_name}/#{list_seq}")
 
