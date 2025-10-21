@@ -44,6 +44,8 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
+    active_decorator (1.5.1)
+      activesupport
     activejob (8.0.3)
       activesupport (= 8.0.3)
       globalid (>= 0.3.6)
@@ -347,6 +349,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  active_decorator
   aws-sdk-s3 (~> 1)
   bootsnap
   brakeman
