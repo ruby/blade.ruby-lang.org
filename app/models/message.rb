@@ -66,7 +66,7 @@ class Message < ApplicationRecord
         handle_body p
       end
     elsif part.attachment?
-      file = StringIO.new(part.decoded)
+      file = StringIO.new(part.body.raw_source)
       attachments.attach(io: file, filename: part.filename, content_type: part.content_type)
     else
       case part.content_type&.downcase
