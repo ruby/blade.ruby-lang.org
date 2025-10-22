@@ -23,13 +23,7 @@ class Message < ApplicationRecord
   def from_mail(mail, list, list_seq)
     self.list_id, self.list_seq, self.published_at = list.id, list_seq, mail.date
 
-    if mail.multipart?
-      mail.parts.each do |p|
-        handle_multipart p
-      end
-    else
-      self.body = Kconv.toutf8 mail.body.raw_source
-    end
+    handle_body mail
 
     if ((list.name == 'ruby-dev') && list_seq.in?([13859, 26229, 39731, 39734])) || ((list.name == 'ruby-core') && list_seq.in?([5231])) || ((list.name == 'ruby-list') && list_seq.in?([29637, 29711, 30148])) || ((list.name == 'ruby-talk') && list_seq.in?([5198, 61316]))
       self.body.gsub!("\u0000", '')
@@ -44,8 +38,9 @@ class Message < ApplicationRecord
     self.subject = mail.subject
     self.subject = Kconv.toutf8 subject if self.subject
 
-    self.from = Kconv.toutf8 mail.from_address&.raw
-    if !self.from && (list.name == 'ruby-core') && (list_seq == 161)
+    self.from = mail.from_address&.raw
+    self.from = Kconv.toutf8 from if from
+    if !from && (list.name == 'ruby-core') && (list_seq == 161)
       self.from = mail.from.encode Encoding::UTF_8, Encoding::KOI8_R
     end
 
@@ -66,15 +61,24 @@ class Message < ApplicationRecord
     self
   end
 
-  private def handle_multipart(part)
-    if part.attachment?
-      file = StringIO.new(part.decoded)
+  private def handle_body(part)
+    if part.multipart?
+      part.parts.each do |p|
+        handle_body p
+      end
+    elsif part.attachment?
+      file = StringIO.new(part.body.raw_source)
       attachments.attach(io: file, filename: part.filename, content_type: part.content_type)
     else
-      case part.content_type.downcase
-      when /^text\/plain/
+      case part.content_type&.downcase
+      when 'application/pgp-signature'
+        # ignore
+      when 'application/ms-tnef'
+        file = StringIO.new(part.decoded)
+        attachments.attach(io: file, filename: part.filename || 'noname', content_type: part.content_type)
+      when /^text\/plain/, /text\/enriched;/, 'message/rfc822', nil
         (self.body ||= '') << Kconv.toutf8(part.body.raw_source)
-      when /^text\/html;/
+      when /^text\/html/
         (self.html_body ||= '') << Kconv.toutf8(part.body.raw_source)
       else
         puts "Unknown content_type: #{part.content_type}"
