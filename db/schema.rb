@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_10_175060) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_22_024234) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -65,6 +65,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_10_175060) do
     t.text "html_body"
     t.index ["body"], name: "index_messages_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["list_id", "list_seq"], name: "index_messages_on_list_id_and_list_seq", unique: true
+    t.index ["message_id_header"], name: "index_messages_on_message_id_header"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
