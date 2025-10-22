@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+@theme {
+  --color-dark-bg: oklch(15% 0 0);
+  --color-dark-card: oklch(20% 0 0);
+  --color-dark-border: oklch(30% 0 0);
+  --color-dark-text: oklch(90% 0 0);
+  --color-dark-text-secondary: oklch(70% 0 0);
+}

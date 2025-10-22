@@ -1,13 +1,13 @@
 <% content_for :title, @message.subject %>
 
 <% if notice %>
-  <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+  <div class="mb-4 p-4 bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 text-green-800 dark:text-green-200 rounded-lg">
     <%= notice %>
   </div>
 <% end %>
 
 <div class="mb-4">
-  <%= link_to "← Back to #{@message.list.name}", "/#{@message.list.name}/", class: "text-red-600 hover:text-red-800 font-medium" %>
+  <%= link_to "← Back to #{@message.list.name}", "/#{@message.list.name}/", class: "text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium" %>
 </div>
 
 <%= render @message %>
