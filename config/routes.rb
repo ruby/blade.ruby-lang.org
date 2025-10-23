@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
-  get "attachments/show"
   resources :messages
   get '/:list_name/:list_seq', to: 'messages#show'
   get '/:list_name/', to: 'messages#index'
+
+  get '/attachments/:encoded_key/*filename' => 'attachments#show', as: :attachment
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
