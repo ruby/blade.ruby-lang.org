@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "attachments/show"
   resources :messages
   get '/:list_name/:list_seq', to: 'messages#show'
   get '/:list_name/', to: 'messages#index'
