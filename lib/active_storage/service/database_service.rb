@@ -33,6 +33,34 @@ module ActiveStorage
 
     private
 
+    def private_url(key, expires_in:, filename:, content_type:, disposition:, **)
+      content_disposition = content_disposition_with(type: disposition, filename: filename)
+      verified_key_with_expiration = ActiveStorage.verifier.generate(
+        {
+          key: key,
+          disposition: content_disposition,
+          content_type: content_type,
+          service_name: name
+        },
+        expires_in: expires_in,
+        purpose: :blob_key
+      )
+
+      if url_options.blank?
+        raise ArgumentError, "Cannot generate URL for #{filename} using Database service, please set ActiveStorage::Current.url_options."
+      end
+
+      url_helpers.attachment_url(verified_key_with_expiration, filename: filename, **url_options)
+    end
+
+    def url_helpers
+      @url_helpers ||= Rails.application.routes.url_helpers
+    end
+
+    def url_options
+      ActiveStorage::Current.url_options
+    end
+
     def service_name
       'Database'
     end

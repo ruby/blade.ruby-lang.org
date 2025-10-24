@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   get '/:list_name/:list_seq', to: 'messages#show'
   get '/:list_name/', to: 'messages#index'
 
+  get '/attachments/:encoded_key/*filename' => 'attachments#show', as: :attachment
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
