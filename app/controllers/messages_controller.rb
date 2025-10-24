@@ -6,7 +6,7 @@ class MessagesController < ApplicationController
     if (list_name = params[:list_name])
       @list = List.find_by_name list_name
 
-      messages = Message.with_recursive(parent_and_children: [Message.where(list_id: @list.id, parent_id: nil).order(:id).limit(100), Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
+      messages = Message.with_recursive(parent_and_children: [Message.where(list_id: @list, parent_id: nil).order(:id).limit(100), Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
         .joins('inner join parent_and_children on parent_and_children.id = messages.id')
       @messages = compose_tree(messages)
     elsif (query = params[:q])
@@ -23,7 +23,7 @@ class MessagesController < ApplicationController
   # GET /messages/ruby-dev/1
   def show
     @list = List.find_by_name(params[:list_name])
-    @message = Message.find_by(list_id: @list.id, list_seq: params[:list_seq])
+    @message = Message.find_by(list_id: @list, list_seq: params[:list_seq])
   end
 
   private
