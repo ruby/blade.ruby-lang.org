@@ -11,7 +11,7 @@
   <p class="text-gray-600 dark:text-gray-400 mt-2">Mailing list archive</p>
 </div>
 
-<div class="grid grid-cols-4 gap-6" style="height: calc(100vh - 16rem);">
+<div class="grid grid-cols-4 gap-6" style="height: calc(100vh - 16rem);" data-controller="message-list">
   <div class="col-span-1 overflow-y-auto space-y-6">
     <%= render partial: 'thread', collection: @messages, as: :message, locals: {list: @list, depth: 0} %>
   </div>

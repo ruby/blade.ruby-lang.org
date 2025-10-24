@@ -13,3 +13,13 @@
  *= require_tree .
  *= require_self
  */
+
+.message-selected {
+    background-color: oklch(98.5% 0.002 247.839) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+    .message-selected {
+        background-color: oklch(40% 0.08 247.839) !important;
+    }
+}

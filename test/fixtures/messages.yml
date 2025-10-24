@@ -6,6 +6,7 @@ message1:
   body: Body1
   list_id: 1
   list_seq: 123
+  published_at: 1995-12-21 05:44:05
 
 message2:
   subject: Mail2
@@ -13,3 +14,4 @@ message2:
   body: Body2
   list_id: 2
   list_seq: 234
+  published_at: 1997-07-28 14:51:40

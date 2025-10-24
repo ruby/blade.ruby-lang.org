@@ -1,6 +1,6 @@
 <div class="thread-message" style="margin-left: <%= depth * 6 %>px;" <% if (depth == 0) && message.children&.any? %>data-controller="thread"<% end %>>
   <% if depth == 0 %>
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
+    <%= link_to "/#{list.name}/#{message.list_seq}", class: 'message-item block bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow', data: {turbo_frame: 'message_content', turbo_action: 'advance', action: 'click->message-list#select'} do %>
       <div class="p-5">
         <div class="flex items-start justify-between gap-4">
           <div class="flex-1 min-w-0">
@@ -10,10 +10,12 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
               <% end %>
-              <span class="px-0.5">[#<%= message.list_seq %>]</span>
-              <%= link_to without_list_prefix(message.subject), "/#{list.name}/#{message.list_seq}", data: {turbo_frame: 'message_content'} %>
+              <span class="px-0.5">[#<%= message.list_seq %>] <%= without_list_prefix(message.subject) %></span>
               <span class="text-sm text-gray-500 dark:text-gray-400 font-normal ml-2">— <%= message.from %></span>
             </h2>
+            <% if message.body.present? %>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-1"><%= message.first_line %></p>
+            <% end %>
             <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
               <span class="inline-flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,25 +23,35 @@
                 </svg>
                 <%= count = message.count_recursively %> <%= count == 1 ? 'message' : 'messages' %>
               </span>
+              <span class="inline-flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <%= message.published_date %>
+              </span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    <% end %>
   <% else %>
-    <div class="py-2 border-l-2 border-gray-200 dark:border-gray-700 pl-4 hover:border-red-400 dark:hover:border-red-500 transition-colors">
+    <%= link_to "/#{list.name}/#{message.list_seq}", class: 'message-item block py-2 border-l-2 border-gray-200 dark:border-gray-700 pl-4 hover:border-red-400 dark:hover:border-red-500 transition-colors', data: {turbo_frame: 'message_content', turbo_action: 'advance', action: 'click->message-list#select'} do %>
       <div class="flex items-start gap-2 text-sm">
         <svg class="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
         </svg>
         <div class="flex-1 min-w-0">
-          <%= link_to "/#{list.name}/#{message.list_seq}", class: 'text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 transition-colors', data: {turbo_frame: 'message_content'} do %>
+          <span class="text-gray-900 dark:text-gray-100 hover:text-red-600 dark:hover:text-red-400 transition-colors">
             <span class="px-0.5">[#<%= message.list_seq %>] <%= without_list_prefix(message.subject) %></span>
-          <% end %>
+          </span>
           <span class="text-gray-500 dark:text-gray-400">— <%= message.from %></span>
+          <span class="text-gray-500 dark:text-gray-400 ml-2"><%= message.published_date %></span>
+          <% if message.body.present? %>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-1"><%= message.first_line %></p>
+          <% end %>
         </div>
       </div>
-    </div>
+    <% end %>
   <% end %>
 
   <% if message.children&.any? %>
