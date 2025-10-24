@@ -1,8 +1,11 @@
 class List
+  include ActiveModel::Model
+
   def initialize(name, id)
     @name = name
     @id = id
   end
+
   attr_reader :name, :id
 
   # Ordered by the established dates. ruby-list was started in 1995.
