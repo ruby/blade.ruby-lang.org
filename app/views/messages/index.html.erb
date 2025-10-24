@@ -6,11 +6,26 @@
   </div>
 <% end %>
 
-<div class="mb-8">
+<div class="mb-4">
   <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100"><%= @list.name %></h1>
   <p class="text-gray-600 dark:text-gray-400 mt-2">Mailing list archive</p>
 </div>
 
-<div class="space-y-6">
-  <%= render partial: 'thread', collection: @messages, as: :message, locals: {list: @list, depth: 0} %>
+<div class="grid grid-cols-4 gap-6" style="height: calc(100vh - 16rem);">
+  <div class="col-span-1 overflow-y-auto space-y-6">
+    <%= render partial: 'thread', collection: @messages, as: :message, locals: {list: @list, depth: 0} %>
+  </div>
+
+  <div class="col-span-3 overflow-y-auto">
+    <%= turbo_frame_tag "message_content", class: "block" do %>
+      <div class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
+        <div class="text-center">
+          <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
+          <p>Select a message to view</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
 </div>
