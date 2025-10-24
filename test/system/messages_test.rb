@@ -16,9 +16,13 @@ class MessagesTest < ApplicationSystemTestCase
     click_link @message2.attachments_attachments.first.blob.filename.to_s
   end
 
-  test "visiting the index" do
+  test 'visiting the search page, and searching a message' do
     visit messages_url
-    assert_selector "h1", text: "Messages"
-  end
+    assert_selector "h1", text: "blade.ruby-lang.org"
 
+    fill_in :q, with: @message1.body
+    click_button 'Search'
+
+    assert_content @message1.subject
+  end
 end
