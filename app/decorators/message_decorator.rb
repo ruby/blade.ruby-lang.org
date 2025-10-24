@@ -8,4 +8,8 @@ module MessageDecorator
   def first_line
     body.lines.first&.strip
   end
+
+  def published_date
+    published_at.strftime('%Y/%m/%d')
+  end
 end
