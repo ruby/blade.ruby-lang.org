@@ -13,11 +13,15 @@ class List
     List.new('ruby-talk', 4),
   ]
 
-  def self.find_by_name(name)
-    LISTS.find { |list| list.name == name }
-  end
+  class << self
+    def find_by_name(name)
+      List::LISTS.find { |list| list.name == name }
+    end
 
-  def self.find_by_id(id)
-    LISTS.find { |list| list.id == id }
+    def find_by_id(id)
+      List::LISTS.find { |list| list.id == id }
+    end
+
+    alias find find_by_id
   end
 end

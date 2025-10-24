@@ -127,7 +127,7 @@ class Message < ApplicationRecord
   end
 
   def list
-    @list ||= List.find_by_id(list_id)
+    @list ||= List.find(list_id)
   end
 
   def count_recursively(count = 0)
@@ -135,7 +135,7 @@ class Message < ApplicationRecord
   end
 
   def reload_from_s3(s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
-    m = Message.from_s3(List.find_by_id(self.list_id).name, self.list_seq, s3_client)
+    m = Message.from_s3(List.find(self.list_id).name, self.list_seq, s3_client)
 
     self.body = m.body
     self.subject = m.subject
