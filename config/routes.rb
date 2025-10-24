@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   get '/:list_name/:list_seq', to: 'messages#show'
-  get '/:list_name/', to: 'messages#index'
+  get '/:list_name/', to: 'messages#index', as: :list
 
   get '/attachments/:encoded_key/*filename' => 'attachments#show', as: :attachment
 

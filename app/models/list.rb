@@ -27,4 +27,12 @@ class List
 
     alias find find_by_id
   end
+
+  def to_param
+    name
+  end
+
+  def persisted?
+    true
+  end
 end
