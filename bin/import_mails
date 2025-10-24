@@ -2,6 +2,7 @@
 
 require 'optparse'
 require 'mail'
+require 'mail/encodings/x_gzip64'
 
 BASE_DIR = Rails.root.join('tmp')
 
