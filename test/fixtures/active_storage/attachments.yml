@@ -1,0 +1,5 @@
+attachment2:
+  name: attachments
+  record_type: Message
+  record: message2
+  blob: blob2

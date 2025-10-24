@@ -1,0 +1,7 @@
+blob2:
+  key: 3mj2l9tdw1nb531oajdax3r7vylh
+  filename: 1.patch
+  content_type: text/x-diff
+  metadata: '{"identified":true,"analyzed":true}'
+  byte_size: 5
+  service_name: local
