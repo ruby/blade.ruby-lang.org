@@ -22,8 +22,8 @@ class MessagesController < ApplicationController
 
   # GET /messages/ruby-dev/1
   def show
-    list = List.find_by_name(params[:list_name])
-    @message = Message.find_by(list_id: list.id, list_seq: params[:list_seq])
+    @list = List.find_by_name(params[:list_name])
+    @message = Message.find_by(list_id: @list.id, list_seq: params[:list_seq])
   end
 
   private
