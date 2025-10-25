@@ -23,7 +23,7 @@ class MessagesController < ApplicationController
   # GET /ruby-dev/1
   def show(list_name:, list_seq:)
     @list = List.find_by_name(list_name)
-    @message = Message.find_by(list_id: @list, list_seq: list_seq)
+    @message = Message.find_by!(list_id: @list, list_seq: list_seq)
   end
 
   private
