@@ -2,12 +2,17 @@ class MessagesController < ApplicationController
   PER_PAGE = 50
 
   # GET /ruby-dev or /q=searchterm
-  def index(list_name: nil, q: nil, page: nil)
+  def index(list_name: nil, yyyymm: nil, q: nil, page: nil)
     if list_name
       @list = List.find_by_name list_name
 
-      messages = Message.with_recursive(parent_and_children: [Message.where(list_id: @list, parent_id: nil).order(:id).limit(100), Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
+      @yyyymms = Message.where(list_id: @list).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
+      @yyyymm = yyyymm || @yyyymms.last
+
+      root_query = Message.where(list_id: @list, parent_id: nil).where("to_char(published_at, 'YYYYMM') = ?", @yyyymm).order(:id)
+      messages = Message.with_recursive(parent_and_children: [root_query, Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
         .joins('inner join parent_and_children on parent_and_children.id = messages.id')
+
       @messages = compose_tree(messages)
     elsif q
       search q, page
