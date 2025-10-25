@@ -6,14 +6,7 @@ class MessagesController < ApplicationController
     if list_name
       @list = List.find_by_name list_name
 
-      @yyyymms = Message.where(list_id: @list).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
-      @yyyymm = yyyymm || @yyyymms.last
-
-      root_query = Message.where(list_id: @list, parent_id: nil).where("to_char(published_at, 'YYYYMM') = ?", @yyyymm).order(:id)
-      messages = Message.with_recursive(parent_and_children: [root_query, Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
-        .joins('inner join parent_and_children on parent_and_children.id = messages.id')
-
-      @messages = compose_tree(messages)
+      render_threads yyyymm: yyyymm
     elsif q
       search q, page
 
@@ -32,6 +25,19 @@ class MessagesController < ApplicationController
   end
 
   private
+
+  def render_threads(yyyymm: nil)
+    @yyyymms = Message.where(list_id: @list).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
+    @yyyymm = yyyymm || @yyyymms.last
+
+    root_query = Message.where(list_id: @list, parent_id: nil).where("to_char(published_at, 'YYYYMM') = ?", @yyyymm).order(:id)
+    messages = Message.with_recursive(parent_and_children: [root_query, Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
+      .joins('inner join parent_and_children on parent_and_children.id = messages.id')
+
+    @messages = compose_tree(messages)
+
+    render :index
+  end
 
   def get_list_ids(params)
     list_ids = []
