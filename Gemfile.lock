@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    action_args (2.7.3)
     actioncable (8.0.3)
       actionpack (= 8.0.3)
       activesupport (= 8.0.3)
@@ -349,6 +350,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  action_args
   active_decorator
   aws-sdk-s3 (~> 1)
   bootsnap
