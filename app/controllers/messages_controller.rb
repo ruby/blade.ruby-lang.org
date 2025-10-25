@@ -23,6 +23,9 @@ class MessagesController < ApplicationController
     @list = List.find_by_name(list_name)
     @message = Message.find_by!(list_id: @list, list_seq: list_seq)
 
+    # Calculate navigation links
+    calculate_navigation_links
+
     # If this is a turbo frame request, just render the message
     return if turbo_frame_request?
 
@@ -30,6 +33,31 @@ class MessagesController < ApplicationController
   end
 
   private
+
+  def calculate_navigation_links
+    # Find root of current thread
+    root = @message
+    while root.parent_id
+      root = Message.find(root.parent_id)
+    end
+
+    # Find previous/next thread (root messages)
+    @prev_thread = Message.where(list_id: @list, parent_id: nil).where('id < ?', root.id).order(id: :desc).first
+    @next_thread = Message.where(list_id: @list, parent_id: nil).where('id > ?', root.id).order(:id).first
+
+    # Get all messages in this thread
+    thread_messages = Message.with_recursive(
+      thread_msgs: [
+        Message.where(id: root.id),
+        Message.joins('inner join thread_msgs on messages.parent_id = thread_msgs.id')
+      ]
+    ).joins('inner join thread_msgs on thread_msgs.id = messages.id').order(:id).to_a
+
+    # Find previous/next message in thread
+    current_index = thread_messages.index {|m| m.id == @message.id }
+    @prev_message_in_thread = thread_messages[current_index - 1] if current_index && current_index > 0
+    @next_message_in_thread = thread_messages[current_index + 1] if current_index
+  end
 
   def render_threads(yyyymm: nil)
     @yyyymms = Message.where(list_id: @list).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
