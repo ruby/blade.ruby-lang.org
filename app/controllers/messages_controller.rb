@@ -22,6 +22,11 @@ class MessagesController < ApplicationController
   def show(list_name:, list_seq:)
     @list = List.find_by_name(list_name)
     @message = Message.find_by!(list_id: @list, list_seq: list_seq)
+
+    # If this is a turbo frame request, just render the message
+    return if turbo_frame_request?
+
+    render_threads yyyymm: @message.published_at.strftime('%Y%m')
   end
 
   private
