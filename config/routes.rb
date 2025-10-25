@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
-  get '/:list_name/:list_seq', to: 'messages#show'
   get '/:list_name/', to: 'messages#index', as: :list
-
+  resources :list, only: [], path: '', param: :name do
+    resources :messages, only: :show, path: '', param: :list_seq
+  end
   get '/attachments/:encoded_key/*filename' => 'attachments#show', as: :attachment
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

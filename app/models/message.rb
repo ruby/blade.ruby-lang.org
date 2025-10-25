@@ -130,6 +130,11 @@ class Message < ApplicationRecord
     @list ||= List.find(list_id)
   end
 
+  def to_param
+    #NOTE: This value isn't unique system-wide. Ideally, this should return a combination of list_name and list_seq
+    list_seq
+  end
+
   def count_recursively(count = 0)
     count + 1 + (children&.sum(&:count_recursively) || 0)
   end
