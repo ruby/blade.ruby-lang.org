@@ -48,13 +48,13 @@ class Message < ApplicationRecord
 
     # mail.in_reply_to returns strange Array object in some cases (?), so let's use the raw value
     parent_message_id_header = extract_message_id_from_in_reply_to(mail.header[:in_reply_to]&.value)
-    self.parent_id = Message.where(list_id: list.id, message_id_header: parent_message_id_header).pick(:id) if parent_message_id_header
+    self.parent_id = Message.where(list_id: list, message_id_header: parent_message_id_header).pick(:id) if parent_message_id_header
     if !self.parent_id && (String === mail.references)
-      self.parent_id = Message.where(list_id: list.id, message_id_header: mail.references).pick(:id)
+      self.parent_id = Message.where(list_id: list, message_id_header: mail.references).pick(:id)
     end
     if !self.parent_id && (Array === mail.references)
       mail.references.compact.each do |ref|
-        break if (self.parent_id = Message.where(list_id: list.id, message_id_header: ref).pick(:id))
+        break if (self.parent_id = Message.where(list_id: list, message_id_header: ref).pick(:id))
       end
     end
 
@@ -128,6 +128,11 @@ class Message < ApplicationRecord
 
   def list
     @list ||= List.find(list_id)
+  end
+
+  def to_param
+    #NOTE: This value isn't unique system-wide. Ideally, this should return a combination of list_name and list_seq
+    list_seq
   end
 
   def count_recursively(count = 0)

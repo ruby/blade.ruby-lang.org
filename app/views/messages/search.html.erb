@@ -27,10 +27,9 @@
 
 <% @messages.each do |message| %>
   <div class="search-result">
-    <% list_name = List.find(message.list_id).name %>
     <h2 class="subject">
-      <span class="prefix"><%= list_name %>:<%= message.list_seq %></span>
-      <%= link_to without_list_prefix(message.subject), "/#{list_name}/#{message.list_seq}" %>
+      <span class="prefix"><%= message.list.name %>:<%= message.list_seq %></span>
+      <%= link_to without_list_prefix(message.subject), [message.list, message] %>
     </h2>
     <div class="snippet"><%= search_snippet(message.body, params[:q]) %></div>
   </div>
