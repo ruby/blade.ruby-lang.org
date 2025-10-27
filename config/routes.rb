@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :messages
   get '/:list_name/:list_seq', to: 'messages#show'
   get '/:list_name/', to: 'messages#index'
 
