@@ -20,20 +20,27 @@
 
   <body class="bg-gray-50 dark:bg-gray-900">
     <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-      <div class="container mx-auto px-4 py-4">
+      <div class="py-4">
         <div class="flex items-start gap-6">
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 pl-4">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
               <%= link_to @list&.name || 'blade.ruby-lang.org', @list || root_path, class: "hover:text-red-600 dark:hover:text-red-400 transition-colors" %>
             </h1>
             <p class="text-gray-600 dark:text-gray-400 mt-2">Mailing list archive</p>
           </div>
 
-          <% if @yyyymms.present? %>
-            <div class="flex-1">
+          <div class="flex-1 pr-4">
+            <%= form_with method: :get, class: 'mb-3' do |f| %>
+              <div class="flex gap-2 max-w-md">
+                <%= f.text_field :q, value: params[:q], placeholder: 'Search messages...', class: 'flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' %>
+                <%= f.submit 'Search', name: nil, class: 'px-4 py-2 text-sm font-medium rounded bg-red-600 dark:bg-red-500 text-white hover:bg-red-700 dark:hover:bg-red-600 transition-colors' %>
+              </div>
+            <% end %>
+
+            <% if @yyyymms.present? %>
               <%= render 'shared/yyyymm_selector' %>
-            </div>
-          <% end %>
+            <% end %>
+          </div>
         </div>
       </div>
     </header>
