@@ -6,14 +6,7 @@ class MessagesController < ApplicationController
     if list_name
       @list = List.find_by_name list_name
 
-      @yyyymms = Message.where(list_id: @list).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
-      @yyyymm = yyyymm || @yyyymms.last
-
-      root_query = Message.where(list_id: @list, parent_id: nil).where("to_char(published_at, 'YYYYMM') = ?", @yyyymm).order(:id)
-      messages = Message.with_recursive(parent_and_children: [root_query, Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
-        .joins('inner join parent_and_children on parent_and_children.id = messages.id')
-
-      @messages = compose_tree(messages)
+      render_threads yyyymm: yyyymm
     elsif q
       search q, page
 
@@ -29,9 +22,27 @@ class MessagesController < ApplicationController
   def show(list_name:, list_seq:)
     @list = List.find_by_name(list_name)
     @message = Message.find_by!(list_id: @list, list_seq: list_seq)
+
+    # If this is a turbo frame request, just render the message
+    return if turbo_frame_request?
+
+    render_threads yyyymm: @message.published_at.strftime('%Y%m')
   end
 
   private
+
+  def render_threads(yyyymm: nil)
+    @yyyymms = Message.where(list_id: @list).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
+    @yyyymm = yyyymm || @yyyymms.last
+
+    root_query = Message.where(list_id: @list, parent_id: nil).where("to_char(published_at, 'YYYYMM') = ?", @yyyymm).order(:id)
+    messages = Message.with_recursive(parent_and_children: [root_query, Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
+      .joins('inner join parent_and_children on parent_and_children.id = messages.id')
+
+    @messages = compose_tree(messages)
+
+    render :index
+  end
 
   def get_list_ids(params)
     list_ids = []
