@@ -13,3 +13,6 @@ Layout:
 
 Metrics:
   Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
