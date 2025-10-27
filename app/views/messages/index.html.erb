@@ -6,9 +6,33 @@
   </div>
 <% end %>
 
-<div class="mb-4">
-  <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100"><%= @list.name %></h1>
-  <p class="text-gray-600 dark:text-gray-400 mt-2">Mailing list archive</p>
+<div class="mb-4 border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-800">
+  <%
+    selected_year = @yyyymm&.[](0, 4)
+    selected_month = @yyyymm&.[](4, 2)
+    years_with_months = @yyyymms.group_by {|yyyymm| yyyymm[0, 4] }.sort.reverse
+  %>
+
+  <!-- Year tabs -->
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-3 border-b border-gray-200 dark:border-gray-700">
+    <% years_with_months.each do |year, months| %>
+      <%= link_to year, [@list, yyyymm: "#{year}#{months.sort.first[4, 2]}"], class: "px-3 py-1 text-sm font-medium rounded whitespace-nowrap transition-colors #{selected_year == year ? 'bg-red-600 dark:bg-red-500 text-white' : 'bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}" %>
+    <% end %>
+  </div>
+
+  <!-- Month tabs -->
+  <% if selected_year %>
+    <div class="flex gap-1 flex-wrap">
+      <% available_months = years_with_months.detect {|y, _| y == selected_year }&.last&.map {|yyyymm| yyyymm[4, 2] } || [] %>
+      <% ('01'..'12').each do |month| %>
+        <% if available_months.include?(month) %>
+          <%= link_to month, [@list, yyyymm: "#{selected_year}#{month}"], class: "px-2 py-1 text-xs font-medium rounded transition-colors #{selected_month == month ? 'bg-red-600 dark:bg-red-500 text-white border-2 border-red-700 dark:border-red-400' : 'bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border-2 border-transparent'}" %>
+        <% else %>
+          <span class="px-2 py-1 text-xs font-medium rounded text-gray-300 dark:text-gray-600 border-2 border-transparent"><%= month %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <div class="grid grid-cols-4 gap-6" style="height: calc(100vh - 16rem);" data-controller="message-list">
