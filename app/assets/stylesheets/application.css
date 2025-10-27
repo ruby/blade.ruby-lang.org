@@ -15,7 +15,7 @@
  */
 
 .message-selected {
-    background-color: oklch(98.5% 0.002 247.839) !important;
+    background-color: oklch(92% 0.05 247.839) !important;
 }
 
 @media (prefers-color-scheme: dark) {
