@@ -6,29 +6,6 @@
   </div>
 <% end %>
 
-<div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
-  <%= form_with(method: :get, class: "space-y-4") do |form| %>
-    <div>
-      <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select mailing lists:</p>
-      <div class="grid grid-cols-2 gap-3">
-        <%
-          [
-            [:ruby_talk, 'ruby-talk (English)'],
-            [:ruby_core, 'ruby-core (For developing Ruby itself, English)'],
-            [:ruby_list, 'ruby-list (Japanese)'],
-            [:ruby_dev, 'ruby-dev (For developing Ruby itself, Japanese)'],
-          ].each do |name, label|
-        %>
-          <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
-            <%= form.check_box name, {checked: params[name] != '0'}, class: "w-4 h-4 text-red-600 bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-gray-600 rounded focus:ring-red-500 dark:focus:ring-red-400 focus:ring-2" %>
-            <span><%= label %></span>
-          </label>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-</div>
-
 <% if @messages.present? %>
   <div class="space-y-4">
     <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Search Results</h2>
