@@ -24,7 +24,7 @@
         <div class="flex items-start gap-6">
           <div class="flex-shrink-0 pl-4">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              <%= link_to @list&.name || 'blade.ruby-lang.org', @list || root_path, class: "hover:text-red-600 dark:hover:text-red-400 transition-colors" %>
+              <%= link_to @list&.name || yield(:title) || 'blade.ruby-lang.org', @list || root_path, class: "hover:text-red-600 dark:hover:text-red-400 transition-colors" %>
             </h1>
             <p class="text-gray-600 dark:text-gray-400 mt-2">Mailing list archive</p>
           </div>
