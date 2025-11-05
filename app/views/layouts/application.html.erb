@@ -23,36 +23,41 @@
       <div class="py-4">
         <div class="flex items-start gap-6">
           <div class="flex-shrink-0 pl-4">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              <%= link_to @list&.name || yield(:title) || 'blade.ruby-lang.org', @list || root_path, class: "hover:text-red-600 dark:hover:text-red-400 transition-colors" %>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              <%= link_to @list&.name || yield(:title) || 'blade.ruby-lang.org', @list || root_path, class: 'hover:text-red-600 dark:hover:text-red-400 transition-colors' %>
             </h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Mailing list archive</p>
+            <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-gray-50 dark:bg-gray-900">
+              <h2 class="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wide mb-2">Mailing Lists</h2>
+              <div class="flex flex-col gap-1">
+                <% List.all.each do |list| %>
+                  <%= link_to list, class: "flex items-center gap-2 px-2 py-1 rounded text-sm transition-colors #{@list&.id == list.id ? 'bg-red-600 dark:bg-red-500 text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400'}" do %>
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <span><%= list.label %></span>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
           </div>
 
           <div class="flex-1 pr-4">
             <%= form_with method: :get, class: 'mb-3' do |f| %>
               <div class="flex gap-2 max-w-md">
-                <%= f.text_field :q, value: params[:q], placeholder: 'Search messages...', class: 'flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' %>
+                <%= f.text_field :q, value: params[:q], placeholder: "Search messages #{"within #{@list.name}" if @list}...", class: 'flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400' %>
                 <%= f.submit 'Search', name: nil, class: 'px-4 py-2 text-sm font-medium rounded bg-red-600 dark:bg-red-500 text-white hover:bg-red-700 dark:hover:bg-red-600 transition-colors' %>
               </div>
 
-              <% if @yyyymms.present? %>
-                <%= render 'shared/yyyymm_selector' %>
+              <% if @list %>
+                <%= render 'shared/yyyymm_selector' if @yyyymms.present? %>
               <% else %>
                 <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 inline-block">
-                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select mailing lists:</p>
-                  <div class="grid grid-cols-2 gap-2">
-                    <%
-                      [
-                        [:ruby_talk, 'ruby-talk (English)'],
-                        [:ruby_core, 'ruby-core (For developing Ruby itself, English)'],
-                        [:ruby_list, 'ruby-list (Japanese)'],
-                        [:ruby_dev, 'ruby-dev (For developing Ruby itself, Japanese)'],
-                      ].each do |name, label|
-                    %>
+                  <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select mailing lists from below to search from, or choose one from the left to navigate:</p>
+                  <div class="grid grid-cols-4 gap-2">
+                    <% List.all.each do |list| %>
                       <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap">
-                        <%= f.check_box name, {checked: params[name] != '0'} %>
-                        <span><%= label %></span>
+                        <%= f.check_box list.name, {checked: params[list.name] != '0'} %>
+                        <span><%= list.name %></span>
                       </label>
                     <% end %>
                   </div>

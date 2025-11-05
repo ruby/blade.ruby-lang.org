@@ -4,7 +4,7 @@
   years_with_months = @yyyymms.group_by {|yyyymm| yyyymm[0, 4] }.sort.reverse
 %>
 
-<div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-800">
+<div class="mt-6 border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-800">
   <!-- Year tabs -->
   <div class="flex gap-2 overflow-x-auto pb-2 mb-3 border-b border-gray-200 dark:border-gray-700">
     <% years_with_months.each do |year, months| %>
