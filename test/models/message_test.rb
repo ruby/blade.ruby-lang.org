@@ -38,7 +38,7 @@ Date: 2005-12-15T19:32:40+09:00
 
 Hello, world!
 END_OF_BODY
-    Message.from_s3('ruby-list', 1234, s3_client)
+    Message.from_s3(List.find_by_name('ruby-list'), 1234, s3_client)
   end
 
   test 'reload_from_s3' do

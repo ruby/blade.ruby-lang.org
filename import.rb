@@ -7,7 +7,7 @@ OptionParser.new do |opts|
   opts.on('--to TO', Integer)
 end.parse!(into: params)
 
-list = params[:list]
+list = List.find_by_name(params[:list])
 
 Message.transaction do
   (params[:from]..params[:to]).each do |seq|
@@ -15,11 +15,11 @@ Message.transaction do
       message = Message.from_s3(list, seq)
       message.save!
     rescue ActiveRecord::RecordNotUnique
-      STDERR.puts("#{list}:#{seq} already exists in Postgres")
+      STDERR.puts("#{list.name}:#{seq} already exists in Postgres")
     rescue Aws::S3::Errors::NoSuchKey
-      STDERR.puts("#{list}:#{seq} doesn't exist in S3")
+      STDERR.puts("#{list.name}:#{seq} doesn't exist in S3")
     rescue StandardError => e
-      STDERR.puts("failed to import #{list}:#{seq}: #{e}")
+      STDERR.puts("failed to import #{list.name}:#{seq}: #{e}")
     end
   end
 end
