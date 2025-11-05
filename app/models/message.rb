@@ -1,5 +1,5 @@
 BLADE_BUCKET_REGION = 'ap-northeast-1'
-BLADE_BUCKET_NAME = 'blade.ruby-lang.org'
+BLADE_BUCKET_NAME = 'blade-data-vault'
 
 require 'kconv'
 
@@ -91,13 +91,10 @@ class Message < ApplicationRecord
   end
 
   class << self
-    def from_s3(list_name, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
-      obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list_name}/#{list_seq}")
-
-      m = self.from_string(obj.body.read)
-      m.list_id = List.find_by_name(list_name).id
-      m.list_seq = list_seq
-      m
+    def from_s3(list, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
+      obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list.name}/#{list_seq}")
+      mail = Mail.read_from_string obj.body.read.force_encoding(Encoding::BINARY)
+      Message.from_mail mail, list, list_seq
     end
 
     def from_string(str)
@@ -140,7 +137,7 @@ class Message < ApplicationRecord
   end
 
   def reload_from_s3(s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
-    m = Message.from_s3(List.find(self.list_id).name, self.list_seq, s3_client)
+    m = Message.from_s3(List.find(self.list_id), self.list_seq, s3_client)
 
     self.body = m.body
     self.subject = m.subject

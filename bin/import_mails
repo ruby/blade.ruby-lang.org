@@ -8,6 +8,7 @@ BASE_DIR = Rails.root.join('tmp')
 
 params = {}
 OptionParser.new do |opts|
+  opts.on('--local')
   opts.on('--list LIST')
   opts.on('--from FROM', Integer)
   opts.on('--to TO', Integer)
@@ -22,17 +23,27 @@ Rails.logger.level = Logger::INFO
 Message.transaction do
   (params[:from]..params[:to]).each do |seq|
     begin
-      filepath = BASE_DIR.join(list.name, seq.to_s)
-      next unless filepath.exist?
+      if params[:local]
+        filepath = BASE_DIR.join(list.name, seq.to_s)
+        raise "No #{seq.to_s}" unless filepath.exist?
+        next
+        next unless filepath.exist?
 
-      str = File.binread filepath
-      next if str.blank?
+        str = File.binread filepath
+        next if str.blank?
 
-      mail = Mail.read_from_string str
-      message = Message.from_mail mail, list, seq
+        mail = Mail.read_from_string str
+        message = Message.from_mail mail, list, seq
+      else
+        message = Message.from_s3(list, seq)
+      end
+
+      p seq if seq % 10 == 0
       message.save!
     rescue ActiveRecord::RecordNotUnique
-      STDERR.puts("#{list}:#{seq} already exists in Postgres")
+      STDERR.puts("#{list.name}:#{seq} already exists in Postgres")
+    rescue Aws::S3::Errors::NoSuchKey
+      STDERR.puts("#{list.name}:#{seq} doesn't exist in S3")
     rescue StandardError => e
       errors << [seq, e]
       STDERR.puts("failed to import #{list.name}:#{seq}: #{e}")
