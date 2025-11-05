@@ -1,5 +1,5 @@
 BLADE_BUCKET_REGION = 'ap-northeast-1'
-BLADE_BUCKET_NAME = 'blade.ruby-lang.org'
+BLADE_BUCKET_NAME = 'blade-data-vault'
 
 require 'kconv'
 
@@ -93,11 +93,8 @@ class Message < ApplicationRecord
   class << self
     def from_s3(list, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
       obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list.name}/#{list_seq}")
-
-      m = self.from_string(obj.body.read)
-      m.list_id = list.id
-      m.list_seq = list_seq
-      m
+      mail = Mail.read_from_string obj.body.read.force_encoding(Encoding::BINARY)
+      Message.from_mail mail, list, list_seq
     end
 
     def from_string(str)
