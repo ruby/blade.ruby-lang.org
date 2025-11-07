@@ -93,7 +93,12 @@ class Message < ApplicationRecord
   class << self
     def from_s3(list, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
       obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list.name}/#{list_seq}")
-      mail = Mail.read_from_string obj.body.read.force_encoding(Encoding::BINARY)
+      str = obj.body.read.force_encoding(Encoding::BINARY)
+      if str.blank?
+        p "#{list.name}:#{list_seq} is empty"
+        return
+      end
+      mail = Mail.read_from_string str
       Message.from_mail mail, list, list_seq
     end
 
