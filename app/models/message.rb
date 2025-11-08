@@ -77,9 +77,9 @@ class Message < ApplicationRecord
         file = StringIO.new(part.decoded)
         attachments.attach(io: file, filename: part.filename || 'noname', content_type: part.content_type)
       when /^text\/plain/, /text\/enriched;/, 'message/rfc822', nil
-        (self.body ||= '') << Kconv.toutf8(part.body.raw_source)
+        (self.body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
       when /^text\/html/
-        (self.html_body ||= '') << Kconv.toutf8(part.body.raw_source)
+        (self.html_body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
       else
         puts "Unknown content_type: #{part.content_type}"
       end
