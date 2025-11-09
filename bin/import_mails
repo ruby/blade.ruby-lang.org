@@ -25,12 +25,16 @@ Message.transaction do
     begin
       if params[:local]
         filepath = BASE_DIR.join(list.name, seq.to_s)
-        raise "No #{seq.to_s}" unless filepath.exist?
-        next
-        next unless filepath.exist?
+        unless filepath.exist?
+          p "#{list.name}:#{seq} doesn't exist"
+          next
+        end
 
         str = File.binread filepath
-        next if str.blank?
+        if str.blank?
+          p "#{list.name}:#{list_seq} is empty"
+          next
+        end
 
         mail = Mail.read_from_string str
         message = Message.from_mail mail, list, seq
