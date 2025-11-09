@@ -95,7 +95,7 @@ class Message < ApplicationRecord
       begin
         obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list.name}/#{list_seq}")
       rescue Aws::S3::Errors::NoSuchKey
-        p "#{list.name}:#{seq} doesn't exist in S3"
+        p "#{list.name}:#{list_seq} doesn't exist in S3"
         return
       end
       str = obj.body.read.force_encoding(Encoding::BINARY)
