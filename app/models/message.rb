@@ -62,7 +62,6 @@ class Message < ApplicationRecord
   end
 
   private def handle_body(part)
-    debugger
     if part.multipart?
       part.parts.each do |p|
         handle_body p
