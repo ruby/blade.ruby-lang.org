@@ -42,8 +42,6 @@ Message.transaction do
       message.save!
     rescue ActiveRecord::RecordNotUnique
       STDERR.puts("#{list.name}:#{seq} already exists in Postgres")
-    rescue Aws::S3::Errors::NoSuchKey
-      STDERR.puts("#{list.name}:#{seq} doesn't exist in S3")
     rescue StandardError => e
       errors << [seq, e]
       STDERR.puts("failed to import #{list.name}:#{seq}: #{e}")

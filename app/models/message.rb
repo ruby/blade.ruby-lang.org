@@ -92,7 +92,12 @@ class Message < ApplicationRecord
 
   class << self
     def from_s3(list, list_seq, s3_client = Aws::S3::Client.new(region: BLADE_BUCKET_REGION))
-      obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list.name}/#{list_seq}")
+      begin
+        obj = s3_client.get_object(bucket: BLADE_BUCKET_NAME, key: "#{list.name}/#{list_seq}")
+      rescue Aws::S3::Errors::NoSuchKey
+        p "#{list.name}:#{seq} doesn't exist in S3"
+        return
+      end
       str = obj.body.read.force_encoding(Encoding::BINARY)
       if str.blank?
         p "#{list.name}:#{list_seq} is empty"
