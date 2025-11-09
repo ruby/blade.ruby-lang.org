@@ -62,6 +62,7 @@ class Message < ApplicationRecord
   end
 
   private def handle_body(part)
+    debugger
     if part.multipart?
       part.parts.each do |p|
         handle_body p
@@ -80,8 +81,12 @@ class Message < ApplicationRecord
         (self.body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
       when /^text\/html/
         (self.html_body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
+      when 'application/octet-stream'
+        # there can be an attachment with nil part.filename (which is equivalent to part.attachment?).
+        file = StringIO.new(part.decoded)
+        attachments.attach(io: file, filename: part.filename || 'noname', content_type: part.content_type)
       else
-        puts "Unknown content_type: #{part.content_type}"
+        raise "Unknown content_type: #{part.content_type}"
       end
     end
   end
