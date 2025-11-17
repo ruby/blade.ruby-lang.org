@@ -4,6 +4,11 @@ BLADE_BUCKET_NAME = 'blade-data-vault'
 require 'kconv'
 
 class Message < ApplicationRecord
+  class PartialSkipped < StandardError
+  end
+  class PartialSaved < StandardError
+  end
+
   # Not really sure we will utlize this configuration,
   # but I don't want to make this column.
   # https://blade.ruby-lang.org/ruby-talk/1 is JST.
@@ -84,6 +89,26 @@ class Message < ApplicationRecord
         # there can be an attachment with nil part.filename (which is equivalent to part.attachment?).
         file = StringIO.new(part.decoded)
         attachments.attach(io: file, filename: part.filename || 'noname', content_type: part.content_type)
+      when /message\/partial; id="(?<id>.*?)"; number=(?<number>\d); total=(?<total>\d)/
+        # message/partial; id=\"Wed_Dec_22_02:43:22_1999@debian\"; number=2; total=2
+        match = Regexp.last_match
+        if match[:number] == match[:total]
+          previous_partials = $partials[match[:id]]
+          first_partial = previous_partials.first
+          body = previous_partials.each_with_object(''.dup) { |msg, str| str << msg.body } << part.body.raw_source
+          str = Kconv.toutf8 body
+          mail = Mail.read_from_string str
+          message = self.class.from_mail mail, first_partial.list, first_partial.list_seq
+          message.save!
+          $partials = {}
+
+          raise PartialSkipped
+        else
+          self.body = part.body.raw_source
+          (($partials ||= {})[match[:id]] ||= []) << self
+          raise PartialSaved
+        end
+        raise "Unknown content_type: #{part.content_type}"
       else
         raise "Unknown content_type: #{part.content_type}"
       end

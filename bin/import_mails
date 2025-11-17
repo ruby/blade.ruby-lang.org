@@ -46,6 +46,10 @@ Message.transaction do
       message.save!
     rescue ActiveRecord::RecordNotUnique
       STDERR.puts("#{list.name}:#{seq} already exists in Postgres")
+    rescue Message::PartialSkipped
+      STDERR.puts("#{list.name}:#{seq} skipping partial")
+    rescue Message::PartialSaved
+      # do nothing
     rescue StandardError => e
       errors << [seq, e]
       STDERR.puts("failed to import #{list.name}:#{seq}: #{e}")
