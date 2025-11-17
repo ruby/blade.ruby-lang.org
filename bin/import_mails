@@ -43,7 +43,7 @@ Message.transaction do
       end
 
       p seq if seq % 10 == 0
-      message.save!
+      message.save! if message
     rescue ActiveRecord::RecordNotUnique
       STDERR.puts("#{list.name}:#{seq} already exists in Postgres")
     rescue Message::PartialSkipped
