@@ -85,7 +85,7 @@ class Message < ApplicationRecord
         (self.body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
       when /^text\/html/
         (self.html_body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
-      when 'application/octet-stream', 'image/gif'
+      when 'application/octet-stream', 'image/gif', 'application/rtf', 'message/delivery-status'
         # there can be an attachment with nil part.filename (which is equivalent to part.attachment?).
         file = StringIO.new(part.decoded)
         attachments.attach(io: file, filename: part.filename || 'noname', content_type: part.content_type)
