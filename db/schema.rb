@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_20_070408) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_20_091844) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -66,7 +66,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_20_070408) do
     t.integer "yyyymm"
     t.index ["body"], name: "index_messages_on_body", opclass: :gin_trgm_ops, using: :gin
     t.index ["list_id", "list_seq"], name: "index_messages_on_list_id_and_list_seq", unique: true
+    t.index ["list_id", "parent_id"], name: "index_messages_on_list_id_and_parent_id"
     t.index ["message_id_header"], name: "index_messages_on_message_id_header"
+    t.index ["parent_id"], name: "index_messages_on_parent_id"
     t.index ["yyyymm"], name: "index_messages_on_yyyymm"
   end
 
