@@ -8,7 +8,7 @@ class MessagesController < ApplicationController
 
       render_threads yyyymm: yyyymm, q: q
     else
-      redirect_to search_all_messages_path
+      redirect_to List.find_by_name('ruby-core')
     end
   end
 
