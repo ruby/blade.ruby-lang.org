@@ -1,20 +1,23 @@
 class MessagesController < ApplicationController
   PER_PAGE = 50
 
-  # GET /ruby-dev or /q=searchterm
-  def index(list_name: nil, yyyymm: nil, q: nil, page: nil)
+  # GET /ruby-dev
+  def index(list_name: nil, yyyymm: nil, q: nil)
     if list_name
       @list = List.find_by_name list_name
 
       render_threads yyyymm: yyyymm, q: q
-    elsif q
-      search q, page
+    else
+      redirect_to search_all_messages_path
+    end
+  end
 
-      render :search
+  # GET /messages/search_all
+  def search_all(q: nil, page: nil)
+    if q
+      search q, page
     else
       @messages = []
-
-      render :search
     end
   end
 
