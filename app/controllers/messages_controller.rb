@@ -32,7 +32,7 @@ class MessagesController < ApplicationController
     # If this is a turbo frame request, just render the message
     return if turbo_frame_request?
 
-    render_threads yyyymm: @message.published_at.strftime('%Y%m')
+    render_threads yyyymm: @message.yyyymm
   end
 
   private
@@ -68,9 +68,9 @@ class MessagesController < ApplicationController
     if q
       root_query.where!('body %> ?', q)
     else
-      @yyyymms = Message.where(list_id: @list, parent_id: nil).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
+      @yyyymms = Message.distinct.where(list_id: @list, parent_id: nil).order('yyyymm').pluck('yyyymm')
       @yyyymm = yyyymm || @yyyymms.last
-      root_query.where!("to_char(published_at, 'YYYYMM') = ?", @yyyymm)
+      root_query.where!(yyyymm: @yyyymm)
     end
 
     messages = Message.with_recursive(parent_and_children: [root_query, Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
@@ -79,7 +79,7 @@ class MessagesController < ApplicationController
     @messages = compose_tree(messages)
 
     if q
-      @yyyymms = @messages.map { it.published_at.strftime('%Y%m') }.uniq
+      @yyyymms = @messages.map { it.yyyymm }.uniq
       @yyyymm = @yyyymms.last
     end
 
