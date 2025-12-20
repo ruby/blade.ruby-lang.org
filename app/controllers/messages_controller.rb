@@ -1,20 +1,23 @@
 class MessagesController < ApplicationController
   PER_PAGE = 50
 
-  # GET /ruby-dev or /q=searchterm
-  def index(list_name: nil, yyyymm: nil, q: nil, page: nil)
+  # GET /ruby-dev
+  def index(list_name: nil, yyyymm: nil, q: nil)
     if list_name
       @list = List.find_by_name list_name
 
-      render_threads yyyymm: yyyymm
-    elsif q
-      search q, page
+      render_threads yyyymm: yyyymm, q: q
+    else
+      redirect_to List.find_by_name('ruby-core')
+    end
+  end
 
-      render :search
+  # GET /messages/search_all
+  def search_all(q: nil, page: nil)
+    if q
+      search q, page
     else
       @messages = []
-
-      render :search
     end
   end
 
@@ -59,38 +62,37 @@ class MessagesController < ApplicationController
     @next_message_in_thread = thread_messages[current_index + 1] if current_index
   end
 
-  def render_threads(yyyymm: nil)
-    @yyyymms = Message.where(list_id: @list).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
-    @yyyymm = yyyymm || @yyyymms.last
+  def render_threads(yyyymm: nil, q: nil)
+    root_query = Message.where(list_id: @list, parent_id: nil).order(:id)
 
-    root_query = Message.where(list_id: @list, parent_id: nil).where("to_char(published_at, 'YYYYMM') = ?", @yyyymm).order(:id)
+    if q
+      root_query.where!('body %> ?', q)
+    else
+      @yyyymms = Message.where(list_id: @list, parent_id: nil).order('yyyymm').pluck(Arel.sql "distinct to_char(published_at, 'YYYYMM') as yyyymm")
+      @yyyymm = yyyymm || @yyyymms.last
+      root_query.where!("to_char(published_at, 'YYYYMM') = ?", @yyyymm)
+    end
+
     messages = Message.with_recursive(parent_and_children: [root_query, Message.joins('inner join parent_and_children on messages.parent_id = parent_and_children.id')])
       .joins('inner join parent_and_children on parent_and_children.id = messages.id')
 
     @messages = compose_tree(messages)
 
+    if q
+      @yyyymms = @messages.map { it.published_at.strftime('%Y%m') }.uniq
+      @yyyymm = @yyyymms.last
+    end
+
     render :index
   end
 
-  def get_list_ids(params)
-    list_ids = []
-    ['ruby-talk', 'ruby-core', 'ruby-list', 'ruby-dev'].each do |name|
-      if params[name.tr('-', '_').to_sym] != '0'
-        list_ids << List.find_by_name(name).id
-      end
-    end
-    list_ids
-  end
-
   def search(query, page)
-    list_ids = get_list_ids(params)
-    if list_ids.empty?
-      raise "Need to select at least one list"
-    end
+    lists = List.all.select { params[it.name] != '0' }
+    raise "Need to select at least one list" if lists.empty?
 
     # %> and <-> are defined by pg_trgm.
     # https://www.postgresql.org/docs/17/pgtrgm.html
-    message_where = Message.where('body %> ? AND list_id IN (?)', query, list_ids).order(Arel.sql('body <-> ?', query))
+    message_where = Message.where('body %> ? AND list_id IN (?)', query, lists.map(&:id)).order(Arel.sql('body <-> ?', query))
     @messages = message_where.offset(page.to_i * PER_PAGE).limit(PER_PAGE)
   end
 
