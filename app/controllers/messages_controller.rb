@@ -3,6 +3,7 @@ class MessagesController < ApplicationController
 
   # GET /ruby-dev
   def index(list_name: nil, yyyymm: nil, q: nil)
+    yyyymm = yyyymm.to_i
     if list_name
       @list = List.find_by_name list_name
 
