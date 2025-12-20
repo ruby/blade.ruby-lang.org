@@ -63,6 +63,8 @@ class Message < ApplicationRecord
       end
     end
 
+    self.yyyymm = self.published_at.strftime('%Y%m')
+
     self
   end
 
