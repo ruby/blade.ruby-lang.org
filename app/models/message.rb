@@ -84,9 +84,11 @@ class Message < ApplicationRecord
         file = StringIO.new(part.decoded)
         attachments.attach(io: file, filename: part.filename || 'noname', content_type: part.content_type)
       when /^text\/plain/, /text\/enriched;/, 'message/rfc822', nil
-        (self.body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
+        # body.decoded: handles Content-Transfer-Encoding (base64, quoted-printable)
+        # Kconv.toutf8: auto-detects charset (handles mislabeled charsets in legacy emails)
+        (self.body ||= ''.dup) << Kconv.toutf8(part.body.decoded)
       when /^text\/html/
-        (self.html_body ||= ''.dup) << Kconv.toutf8(part.body.raw_source)
+        (self.html_body ||= ''.dup) << Kconv.toutf8(part.body.decoded)
       when 'application/octet-stream', 'image/gif', 'application/rtf', 'message/delivery-status'
         # there can be an attachment with nil part.filename (which is equivalent to part.attachment?).
         file = StringIO.new(part.decoded)
