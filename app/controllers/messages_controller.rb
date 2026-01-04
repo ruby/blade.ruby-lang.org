@@ -72,7 +72,10 @@ class MessagesController < ApplicationController
     if q
       root_query.where!('body %> ?', q)
     else
-      @yyyymms = Message.distinct.where(list_id: @list, parent_id: nil).order('yyyymm').pluck('yyyymm')
+      # Cache YYYYMM list per mailing list
+      @yyyymms = Rails.cache.fetch("list:#{@list.id}:yyyymms") do
+        Message.distinct.where(list_id: @list, parent_id: nil).order('yyyymm').pluck('yyyymm')
+      end
       @yyyymm = yyyymm || @yyyymms.last
       root_query.where!(yyyymm: @yyyymm)
     end
