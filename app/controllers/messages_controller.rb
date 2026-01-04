@@ -39,23 +39,26 @@ class MessagesController < ApplicationController
   private
 
   def calculate_navigation_links
-    # Find root of current thread
-    root = @message
-    while root.parent_id
-      root = Message.find(root.parent_id)
+    # Find root of current thread (cached)
+    root_id = Rails.cache.fetch("message:#{@message.id}:root_id") do
+      root = @message
+      root = Message.find(root.parent_id) while root.parent_id
+      root.id
     end
 
     # Find previous/next thread (root messages)
-    @prev_thread_seq = Message.where(list_id: @list, parent_id: nil).where('id < ?', root.id).order(id: :desc).pick(:list_seq)
-    @next_thread_seq = Message.where(list_id: @list, parent_id: nil).where('id > ?', root.id).order(:id).pick(:list_seq)
+    @prev_thread_seq = Message.where(list_id: @list, parent_id: nil).where('id < ?', root_id).order(id: :desc).pick(:list_seq)
+    @next_thread_seq = Message.where(list_id: @list, parent_id: nil).where('id > ?', root_id).order(:id).pick(:list_seq)
 
-    # Get all messages in this thread
-    thread_messages = Message.with_recursive(
-      thread_msgs: [
-        Message.where(id: root.id),
-        Message.joins('inner join thread_msgs on messages.parent_id = thread_msgs.id')
-      ]
-    ).joins('inner join thread_msgs on thread_msgs.id = messages.id').order(:id).pluck(:id, :list_seq)
+    # Get all messages in this thread (cached)
+    thread_messages = Rails.cache.fetch("thread:#{root_id}:messages") do
+      Message.with_recursive(
+        thread_msgs: [
+          Message.where(id: root_id),
+          Message.joins('inner join thread_msgs on messages.parent_id = thread_msgs.id')
+        ]
+      ).joins('inner join thread_msgs on thread_msgs.id = messages.id').order(:id).pluck(:id, :list_seq)
+    end
 
     # Find previous/next message in thread
     current_index = thread_messages.index {|(id, _)| id == @message.id }
@@ -69,7 +72,10 @@ class MessagesController < ApplicationController
     if q
       root_query.where!('body %> ?', q)
     else
-      @yyyymms = Message.distinct.where(list_id: @list, parent_id: nil).order('yyyymm').pluck('yyyymm')
+      # Cache YYYYMM list per mailing list
+      @yyyymms = Rails.cache.fetch("list:#{@list.id}:yyyymms") do
+        Message.distinct.where(list_id: @list, parent_id: nil).order('yyyymm').pluck('yyyymm')
+      end
       @yyyymm = yyyymm || @yyyymms.last
       root_query.where!(yyyymm: @yyyymm)
     end
