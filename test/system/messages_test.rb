@@ -17,8 +17,8 @@ class MessagesTest < ApplicationSystemTestCase
   end
 
   test 'visiting the search page, and searching a message' do
-    visit root_url
-    assert_selector "h1", text: "blade.ruby-lang.org"
+    visit '/ruby-list'  # message1 is in ruby-list
+    assert_selector 'h1', text: 'ruby-list'
 
     fill_in :q, with: @message1.body
     click_button 'Search'
