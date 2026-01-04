@@ -112,7 +112,6 @@ class Message < ApplicationRecord
           (($partials ||= {})[match[:id]] ||= []) << self
           raise PartialSaved
         end
-        raise "Unknown content_type: #{part.content_type}"
       else
         raise "Unknown content_type: #{part.content_type}"
       end
