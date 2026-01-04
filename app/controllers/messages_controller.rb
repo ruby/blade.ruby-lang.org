@@ -50,13 +50,15 @@ class MessagesController < ApplicationController
     @prev_thread_seq = Message.where(list_id: @list, parent_id: nil).where('id < ?', root_id).order(id: :desc).pick(:list_seq)
     @next_thread_seq = Message.where(list_id: @list, parent_id: nil).where('id > ?', root_id).order(:id).pick(:list_seq)
 
-    # Get all messages in this thread
-    thread_messages = Message.with_recursive(
-      thread_msgs: [
-        Message.where(id: root_id),
-        Message.joins('inner join thread_msgs on messages.parent_id = thread_msgs.id')
-      ]
-    ).joins('inner join thread_msgs on thread_msgs.id = messages.id').order(:id).pluck(:id, :list_seq)
+    # Get all messages in this thread (cached)
+    thread_messages = Rails.cache.fetch("thread:#{root_id}:messages") do
+      Message.with_recursive(
+        thread_msgs: [
+          Message.where(id: root_id),
+          Message.joins('inner join thread_msgs on messages.parent_id = thread_msgs.id')
+        ]
+      ).joins('inner join thread_msgs on thread_msgs.id = messages.id').order(:id).pluck(:id, :list_seq)
+    end
 
     # Find previous/next message in thread
     current_index = thread_messages.index {|(id, _)| id == @message.id }
