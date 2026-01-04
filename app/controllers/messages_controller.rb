@@ -55,12 +55,12 @@ class MessagesController < ApplicationController
         Message.where(id: root.id),
         Message.joins('inner join thread_msgs on messages.parent_id = thread_msgs.id')
       ]
-    ).joins('inner join thread_msgs on thread_msgs.id = messages.id').order(:id).to_a
+    ).joins('inner join thread_msgs on thread_msgs.id = messages.id').order(:id).pluck(:id, :list_seq)
 
     # Find previous/next message in thread
-    current_index = thread_messages.index {|m| m.id == @message.id }
-    @prev_message_in_thread = thread_messages[current_index - 1] if current_index && current_index > 0
-    @next_message_in_thread = thread_messages[current_index + 1] if current_index
+    current_index = thread_messages.index {|(id, _)| id == @message.id }
+    @prev_message_in_thread_seq = thread_messages[current_index - 1]&.last if current_index && current_index > 0
+    @next_message_in_thread_seq = thread_messages[current_index + 1]&.last if current_index
   end
 
   def render_threads(yyyymm: nil, q: nil)
