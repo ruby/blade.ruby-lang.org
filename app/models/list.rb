@@ -3,7 +3,7 @@ class List
 
   def initialize(id, name, label)
     @id, @name, @label = id, name, label
-    nil
+    nil # rubocop:disable Lint/Void
   end
 
   attr_reader :id, :name, :label
