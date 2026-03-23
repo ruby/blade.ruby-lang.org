@@ -2,7 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     action_args (2.7.3)
-    action_text-trix (2.1.16)
+    action_text-trix (2.1.17)
       railties
     actioncable (8.1.2.1)
       actionpack (= 8.1.2.1)
@@ -128,7 +128,7 @@ GEM
       reline (>= 0.3.8)
     docile (1.4.1)
     drb (2.2.3)
-    erb (6.0.1)
+    erb (6.0.2)
     erubi (1.13.1)
     globalid (1.3.0)
       activesupport (>= 6.1)
@@ -139,8 +139,9 @@ GEM
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
     io-console (0.8.2)
-    irb (1.16.0)
+    irb (1.17.0)
       pp (>= 0.6.0)
+      prism (>= 1.3.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jmespath (1.6.2)
@@ -250,7 +251,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
-    rdoc (7.0.3)
+    rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
       tsort
@@ -310,7 +311,7 @@ GEM
     tailwindcss-ruby (4.1.13-x86_64-darwin)
     tailwindcss-ruby (4.1.13-x86_64-linux-gnu)
     tailwindcss-ruby (4.1.13-x86_64-linux-musl)
-    thor (1.4.0)
+    thor (1.5.0)
     timeout (0.6.1)
     tsort (0.2.0)
     turbo-rails (2.0.17)
@@ -330,7 +331,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.7.4)
+    zeitwerk (2.7.5)
 
 PLATFORMS
   aarch64-linux
